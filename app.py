@@ -12,23 +12,16 @@ from db.database import ClassroomDb
 
 def get_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ip', dest='ip',
+    parser.add_argument('--ip', dest='ip', default='127.0.0.1',
                         help='Optional. IP address to bind the server to. Default is 127.0.0.1')
-    parser.add_argument('-p', '--port', dest='port',
+    parser.add_argument('-p', '--port', dest='port', default=5000,
                         help='Optional. Port to listen for the server. Default is 5000/tcp')
-    parser.add_argument('-l', '--logging', dest='log_level',
+    parser.add_argument('-l', '--logging', dest='log_level', default=logging.INFO,
+                        choices=['INFO', 'DEBUG', 'WARN', 'ERROR'],
                         help='Optional. Logging level to use in application. '
                              'Can be one of the following: [INFO, DEBUG, WARN, ERROR]. Default is INFO.')
 
-    options = parser.parse_args()
-    if not options.ip:
-        options.ip = '127.0.0.1'
-    if not options.port:
-        options.port = 5000
-    if not options.log_level:
-        options.log_level = 'INFO'
-
-    return options
+    return parser.parse_args()
 
 
 """CONFIGURATION """
@@ -62,6 +55,5 @@ def home():
     return render_template('home.html')
 
 
-"""APPLICATION STARTUP"""
 if __name__ == '__main__':
     app.run(host=options.ip, port=options.port)
