@@ -5,3 +5,4 @@ MarkupSafe
 Werkzeug
 itsdangerous
 setuptools
+pymysql
