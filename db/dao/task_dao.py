@@ -5,8 +5,8 @@ import sys
 
 sys.path.append('..')
 
-from database import ClassroomDb
-from model import Task
+from db.database import ClassroomDb
+from db.dao.model import Task
 import logging
 
 

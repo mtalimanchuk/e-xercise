@@ -6,8 +6,8 @@ import sys
 
 sys.path.append('..')
 
-from database import ClassroomDb
-from model import Student
+from db.database import ClassroomDb
+from db.dao.model import Student
 import uuid
 
 
