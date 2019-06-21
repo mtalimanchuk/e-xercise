@@ -59,7 +59,7 @@ class ClassroomDb:
     def query_for_object(self, query):
         if query is None or query == '':
             raise Exception("SQL query cannot be blank")
-        if 'UPDATE' in query.upper() or 'DELETE' in query.upper() or 'DELETE' in query.upper():
+        if 'UPDATE' in query.upper() or 'INSERT' in query.upper() or 'DELETE' in query.upper():
             raise Exception("Illegal statement provided in query. Only SELECT is allowed.")
         cursor = self.connection.cursor()
         try:
@@ -75,7 +75,7 @@ class ClassroomDb:
     def query_for_list(self, query):
         if query is None or query == '':
             raise Exception("SQL query cannot be blank")
-        if 'UPDATE' in query.upper() or 'DELETE' in query.upper() or 'DELETE' in query.upper():
+        if 'UPDATE' in query.upper() or 'INSERT' in query.upper() or 'DELETE' in query.upper():
             raise Exception("Illegal statement provided in query. Only SELECT is allowed.")
         cursor = self.connection.cursor()
         try:
