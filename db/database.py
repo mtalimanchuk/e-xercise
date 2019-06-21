@@ -29,6 +29,33 @@ class ClassroomDb:
                             datefmt='%m/%d/%Y %I:%M:%S %p',
                             level=log_level)
 
+    """Validate incoming id
+    @:param id: - an ID to validate
+    @:param messageAppender - an appender for the error messages. Optional.
+    """
+
+    @staticmethod
+    def validate_id(id, messageAppender=None):
+        if not id or id == '':
+            raise Exception(f"{messageAppender or ''}_id cannot be blank")
+        try:
+            int(id)
+        except:
+            raise Exception(f"{messageAppender or ''}_id [{id}] cannot be casted to int.")
+
+    """Validate incoming string
+    @:param chars: - a string to validate
+    @:param messageAppender - an appender for the error messages.
+    @:param validate for the maximum char length. Optional.
+    """
+
+    @staticmethod
+    def validate_varchar(chars, messageAppender, length=None):
+        if not chars or chars == '':
+            raise Exception(f'{messageAppender} cannot be blank')
+        if length and len(chars) > length:
+            raise Exception(f'Provided string is longer then limit: {len(chars)}/{length}')
+
     def query_for_object(self, query):
         if query is None or query == '':
             raise Exception("SQL query cannot be blank")

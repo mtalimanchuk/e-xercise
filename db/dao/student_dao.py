@@ -8,6 +8,7 @@ sys.path.append('..')
 
 from database import ClassroomDb
 from model import Student
+import uuid
 
 
 class StudentDao(ClassroomDb):
@@ -24,22 +25,18 @@ class StudentDao(ClassroomDb):
         student.unique_url = row[3]
         return student
 
-    """Validate incoming params"""
-
     @staticmethod
-    def validate(id):
-        if not id or id == '':
-            raise Exception("Student id cannot be blank")
-        try:
-            int(id)
-        except:
-            raise Exception("Student id [%s] cannot be casted to int." % id)
+    def generate_unique_url():
+        return uuid.uuid4().hex + uuid.uuid4().hex
 
-    def save(self, student):
-        pass
+    def save(self, username):
+        super().validate_varchar(username, "student username")
+        query = f"INSERT INTO student (username, is_active, unique_url) " \
+            f"VALUES ('{username}',{1}, '{self.generate_unique_url()}')"
+        return super().execute_statement(query)
 
     def get(self, id):
-        self.validate(id)
+        super().validate_id(id, 'student')
         logging.debug('Get a student, id: [%s]' % id)
         query = "SELECT * FROM student WHERE id = %s" % id
         raw_data = super().query_for_object(query)
@@ -54,7 +51,7 @@ class StudentDao(ClassroomDb):
             return [self.row_mapper(row) for row in raw_data]
 
     def delete(self, id):
-        self.validate(id)
+        super().validate_id(id, 'student')
         logging.debug('Delete a user %s' % id)
 
         logging.debug("Deleting user's [%s] assignments" % id)
@@ -63,13 +60,5 @@ class StudentDao(ClassroomDb):
 
         logging.debug('Deleting a user %s' % id)
         query = "DELETE FROM student WHERE id = %s" % id
-        super().execute_statement(query)
-
-
-DB_HOST = 'localhost'
-DB_USERNAME = 'classroom'
-DB_PASSWORD = 'classroom'
-DB_NAME = 'classroom_db'
-
-student_dao = StudentDao(db_host=DB_HOST, username=DB_USERNAME, password=DB_PASSWORD, db_name=DB_NAME)
+        return super().execute_statement(query)
 
