@@ -1,5 +1,9 @@
-DELETE FROM task;
-DELETE FROM student;
+DELETE
+FROM assigment;
+DELETE
+FROM task;
+DELETE
+FROM student;
 
 INSERT INTO student(id, username, is_active, unique_url)
 VALUES (1, 'v.zadov', 1, 'eOyjOZb9eIfULKMmGczVdCQvAuCnYw0BFVpc8os2QUtn7j4Ow4fiGJX1svOtJuGDOGkcHx'),
@@ -8,35 +12,30 @@ VALUES (1, 'v.zadov', 1, 'eOyjOZb9eIfULKMmGczVdCQvAuCnYw0BFVpc8os2QUtn7j4Ow4fiGJ
        (4, 'n.zadova', 1, '26z97fO8jaiGuKKI5mmkHW5pWKEbGlS2agkIR8GygOOyG2EeBZOnOb2gBXK97UvKONcXn0'),
        (5, 's.smorkovich', 0, 'p4KRIPI7QhF21yCS6N1IeNj7sdzKGWTmpkpGLPKs4QGurtdWCmfCRRueCSvNsJazTZMnym');
 
-INSERT INTO task(student_id, is_completed, content, completion_timestamp)
-VALUES (1, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (1, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (1, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (1, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (2, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (3, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (4, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (4, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (4, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (4, 0, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (5, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (5, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (5, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (5, 1, 'SCRAPED TABOEBA SENTENCE', NULL),
-       (5, 1, 'SCRAPED TABOEBA SENTENCE', NULL);
+INSERT INTO task(id, content)
+VALUES (1, 'SCRAPED TABOEBA SENTENCE ONE'),
+       (2, 'SCRAPED TABOEBA SENTENCE TWO'),
+       (3, 'SCRAPED TABOEBA SENTENCE THREE'),
+       (4, 'SCRAPED TABOEBA SENTENCE FOUR'),
+       (5, 'SCRAPED TABOEBA SENTENCE FIVE'),
+       (6, 'SCRAPED TABOEBA SENTENCE SIX'),
+       (7, 'SCRAPED TABOEBA SENTENCE SEVEN');
+
+INSERT INTO assigment(student_id, task_id)
+VALUES (1, 1),
+       (1, 2),
+       (1, 3),
+       (1, 4),
+       (2, 1),
+       (2, 2),
+       (2, 3),
+       (2, 4),
+       (2, 5),
+       (3, 1),
+       (3, 2),
+       (4, 1),
+       (4, 2),
+       (4, 3),
+       (5, 1),
+       (5, 3),
+       (4, 4);

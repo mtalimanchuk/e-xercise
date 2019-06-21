@@ -22,7 +22,13 @@ class Student(BaseModel):
 class Task(BaseModel):
     def __init__(self):
         super().__init__()
-        self.student_id = None
         self.content = None
+
+
+class Assigment(BaseModel):
+    def __init__(self):
+        super().__init__()
+        self.task_id = None
+        self.student_id = None
         self.is_completed = False
         self.completion_timestamp = None

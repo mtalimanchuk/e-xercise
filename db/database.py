@@ -23,8 +23,15 @@ class ClassroomDb:
         if 'UPDATE' in query.upper() or 'DELETE' in query.upper() or 'DELETE' in query.upper():
             raise Exception("Illegal statement provided in query. Only SELECT is allowed.")
         cursor = self.connection.cursor()
-        cursor.execute(query)
-        return "%s" % cursor.fetchone()
+        try:
+            cursor.execute(query)
+            data = cursor.fetchone()
+            cursor.close()
+            return "%s" % data
+        except pymysql.err.ProgrammingError as mysqlError:
+            logging.error(f"SQL syntax error: {mysqlError}")
+        except Exception as e:
+            logging.error(f'Unexpected error during SQL execution: {e}')
 
     def query_for_list(self, query):
         if query is None or query == '':
@@ -32,8 +39,17 @@ class ClassroomDb:
         if 'UPDATE' in query.upper() or 'DELETE' in query.upper() or 'DELETE' in query.upper():
             raise Exception("Illegal statement provided in query. Only SELECT is allowed.")
         cursor = self.connection.cursor()
-        cursor.execute(query)
-        return "%s" % cursor.fetchall()
+        try:
+            cursor.execute(query)
+            data = cursor.fetchall()
+            cursor.close()
+            return "%s" % data
+        except pymysql.err.ProgrammingError as mysqlError:
+            logging.error(f"SQL syntax error: {mysqlError}")
+            return
+        except Exception as e:
+            logging.error(f'Unexpected error during SQL execution: {e}')
+            return
 
     def execute_statement(self, statement):
         if statement is None or statement == '':
@@ -45,10 +61,12 @@ class ClassroomDb:
             self.connection.commit()
             cursor.close()
             return True
-        except pymysql.err.ProgrammingError as pymysql_error:
-            logging.error(f'SQL syntax error: {pymysql_error}')
+        except pymysql.err.ProgrammingError as mysqlError:
+            logging.error(f'SQL syntax error: {mysqlError}')
+            self.connection.rollback()
         except Exception as e:
             logging.error(f'SQL execution failed: {e}')
+            self.connection.rollback()
 
     def execute_statements(self, list_of_statements):
         if list_of_statements is None or len(list_of_statements) == 0:
@@ -66,13 +84,15 @@ class ClassroomDb:
             return True
         except pymysql.err.ProgrammingError as pymysql_error:
             logging.error(f'Database syntax error: {pymysql_error}')
+            self.connection.rollback()
         except Exception as e:
             logging.error(f'SQL execution failed: {e}')
+            self.connection.rollback()
 
     def init_schema(self, schema_init_file):
         if schema_init_file is None or schema_init_file == '':
             raise Exception("Schema creation file cannot be blank")
-        initialized = self.execute_statements(open(schema_init_file, 'r').read().replace('\n', ''))
+        initialized = self.execute_statements(open(schema_init_file, 'r').read().replace('\n', ' '))
         if initialized:
             logging.info('Schema initialized.')
         else:
@@ -81,7 +101,7 @@ class ClassroomDb:
     def init_test_data(self, test_data_file):
         if test_data_file is None or test_data_file == '':
             raise Exception("Test data creation file cannot be blank")
-        initialized = self.execute_statements(open(test_data_file, 'r').read().replace('\n', ''))
+        initialized = self.execute_statements(open(test_data_file, 'r').read().replace('\n', ' '))
         if initialized:
             logging.info('Test data have been inserted.')
         else:
