@@ -46,7 +46,7 @@ class TaskDao(ClassroomDb):
         logging.debug('Delete a task %s' % id)
 
         logging.debug("Deleting task's [%s] assignments" % id)
-        query = "DELETE FROM assignments WHERE task_id = %s" % id
+        query = "DELETE FROM assignment WHERE task_id = %s" % id
         super().execute_statement(query)
 
         logging.debug('Deleting a task %s' % id)
