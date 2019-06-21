@@ -23,7 +23,7 @@ class AssignmentDao(ClassroomDb):
         assignment.completion_timestamp = row[4]
         return assignment
 
-    def save(self, student_id, task_id):
+    def assign(self, student_id, task_id):
         super().validate_id(student_id, "student")
         super().validate_id(task_id, "task")
 
