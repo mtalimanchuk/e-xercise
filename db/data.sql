@@ -1,5 +1,5 @@
 DELETE
-FROM assignments;
+FROM assignment;
 DELETE
 FROM task;
 DELETE
@@ -21,7 +21,7 @@ VALUES (1, 'SCRAPED TABOEBA SENTENCE ONE'),
        (6, 'SCRAPED TABOEBA SENTENCE SIX'),
        (7, 'SCRAPED TABOEBA SENTENCE SEVEN');
 
-INSERT INTO assignments(student_id, task_id)
+INSERT INTO assignment(student_id, task_id)
 VALUES (1, 1),
        (1, 2),
        (1, 3),

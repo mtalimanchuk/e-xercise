@@ -25,7 +25,7 @@ class Task(BaseModel):
         self.content = None
 
 
-class Assigment(BaseModel):
+class Assignment(BaseModel):
     def __init__(self):
         super().__init__()
         self.task_id = None
