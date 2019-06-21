@@ -31,6 +31,16 @@ class AssignmentDao(ClassroomDb):
             f"VALUES ({student_id}, {task_id})"
         return super().execute_statement(query)
 
+    def complete_task(self, student_id, task_id):
+        super().validate_id(student_id, "student")
+        super().validate_id(task_id, "task")
+
+        query = f'UPDATE assignment ' \
+            f'SET is_completed = 1, ' \
+            f'completion_timestamp = NOW() ' \
+            f'WHERE student_id = {student_id} AND task_id = {task_id}'
+        return super().execute_statement(query)
+
     def get(self, id):
         super().validate_id(id, 'assignment')
         logging.debug('Get an assignment: %s' % id)
