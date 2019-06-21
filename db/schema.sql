@@ -1,3 +1,7 @@
+#CREATE USER classroom@localhost IDENTIFIED BY 'changeme';
+#CREATE DATABASE classroom_db;
+#GRANT ALL PRIVILEGES ON classroom_db@localhost TO classroom@localhost IDENTIFIED BY 'changeme';
+
 DROP TABLE IF EXISTS task;
 DROP TABLE IF EXISTS student;
 
