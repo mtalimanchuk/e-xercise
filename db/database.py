@@ -6,8 +6,16 @@ import pymysql
 
 
 class ClassroomDb:
-    def __init__(self, db_host, username, password, db_name):
-        if db_host is None or username is None or password is None or db_name is None:
+    def __init__(self,
+                 db_host,
+                 username,
+                 password,
+                 db_name,
+                 log_level='INFO'):
+        if db_host is None \
+                or username is None \
+                or password is None \
+                or db_name is None:
             raise Exception(
                 "Database connection properties cannot be blank. URL, username, password and db name are mandatory.")
         self.db_host = db_host
@@ -16,6 +24,10 @@ class ClassroomDb:
         self.db_name = db_name
         self.connection = pymysql.connect(self.db_host, self.username, self.password, self.db_name)
         self.connection.autocommit(False)
+
+        logging.basicConfig(format='[%(asctime)s %(levelname)s]: %(message)s',
+                            datefmt='%m/%d/%Y %I:%M:%S %p',
+                            level=log_level)
 
     def query_for_object(self, query):
         if query is None or query == '':
@@ -27,7 +39,7 @@ class ClassroomDb:
             cursor.execute(query)
             data = cursor.fetchone()
             cursor.close()
-            return "%s" % data
+            return data
         except pymysql.err.ProgrammingError as mysqlError:
             logging.error(f"SQL syntax error: {mysqlError}")
         except Exception as e:
@@ -43,7 +55,7 @@ class ClassroomDb:
             cursor.execute(query)
             data = cursor.fetchall()
             cursor.close()
-            return "%s" % data
+            return data
         except pymysql.err.ProgrammingError as mysqlError:
             logging.error(f"SQL syntax error: {mysqlError}")
             return
