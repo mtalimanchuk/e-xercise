@@ -5,10 +5,10 @@ import logging
 
 from flask import Flask, render_template
 
-from db.database import ClassroomDb
+from db.dao.assignments_dao import AssignmentDao
 from db.dao.student_dao import StudentDao
 from db.dao.task_dao import TaskDao
-from db.dao.assignments_dao import AssignmentDao
+from db.database import ClassroomDb
 
 """COMMAND LINE ARGUMENTS"""
 
@@ -67,8 +67,7 @@ student_dao = StudentDao(db_host=DB_HOST,
                          db_name=DB_NAME,
                          log_level=options.log_level)
 # assignments tasks to students crud operations
-assignment_dao = AssignmentDao(db_host=
-                               DB_HOST,
+assignment_dao = AssignmentDao(db_host=DB_HOST,
                                username=DB_USERNAME,
                                password=DB_PASSWORD,
                                db_name=DB_NAME,
