@@ -41,15 +41,15 @@ DB_USERNAME = 'classroom'
 DB_PASSWORD = 'classroom'
 DB_NAME = 'classroom_db'
 
-DB_SCHEMA_FILE = './db/schema.sql'
-DB_TEST_DATA_FILE = './db/data.sql'
-
 # FIXME: this is for the dev environment and should be removed before going live
 db = ClassroomDb(db_host=DB_HOST,
                  username=DB_USERNAME,
                  password=DB_PASSWORD,
                  db_name=DB_NAME,
                  log_level=options.log_level)
+DB_SCHEMA_FILE = './db/schema.sql'
+DB_TEST_DATA_FILE = './db/data.sql'
+
 db.init_schema(DB_SCHEMA_FILE)
 db.init_test_data(DB_TEST_DATA_FILE)
 
