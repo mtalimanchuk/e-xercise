@@ -122,6 +122,7 @@ def get_student():
         return jsonify(students=student.to_resource()), 200
     # get all
     if not username:
+        logging.info('Get all students')
         all_students = [s.to_resource() for s in student_dao.get_all()]
         return jsonify(students=all_students), 200
 
