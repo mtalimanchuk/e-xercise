@@ -79,11 +79,11 @@ API_PREFIX = '/api/v1'
 STUDENTS_URL = API_PREFIX + '/students'
 
 
-def bad_request(error_message):  # 400 - bad request ;)
+def bad_request(error_message):
     abort(400, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
 
 
-def not_found(error_message):  # 404 - not found ;)
+def not_found(error_message):
     abort(404, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
 
 
