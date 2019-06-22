@@ -43,6 +43,15 @@ class StudentDao(ClassroomDb):
         if raw_data:
             return self.row_mapper(raw_data)
 
+    def get_by_username(self, username):
+        super().validate_varchar(username, 'student username', 100)
+        logging.debug('Get a student, username: [%s]' % username)
+        query = "SELECT * FROM student WHERE username = '%s'" % username
+        raw_data = super().query_for_object(query)
+        if raw_data:
+            return self.row_mapper(raw_data)
+
+
     def get_all(self):
         logging.debug('Get all students')
         query = "SELECT * FROM student"
@@ -55,7 +64,7 @@ class StudentDao(ClassroomDb):
         logging.debug('Delete a user %s' % id)
 
         logging.debug("Deleting user's [%s] assignments" % id)
-        query = "DELETE FROM assignments WHERE student_id = %s" % id
+        query = "DELETE FROM assignment WHERE student_id = %s" % id
         super().execute_statement(query)
 
         logging.debug('Deleting a user %s' % id)

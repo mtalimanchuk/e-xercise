@@ -18,11 +18,21 @@ class Student(BaseModel):
         self.unique_url = None
         self.is_active = None
 
+    def to_resource(self):
+        return \
+            {"username": self.username,
+             "is_active": True if self.is_active == 1 else False,
+             "unique_url": self.unique_url}
+
 
 class Task(BaseModel):
     def __init__(self):
         super().__init__()
         self.content = None
+
+    def to_resource(self):
+        return \
+            {"content": self.content}
 
 
 class Assignment(BaseModel):
@@ -32,3 +42,13 @@ class Assignment(BaseModel):
         self.student_id = None
         self.is_completed = False
         self.completion_timestamp = None
+
+    def to_resource(self):
+        return \
+            {
+                "task_id": self.task_id,
+                "student_id": self.student_id,
+                "is_completed": True if self.is_completed == 1 else False,
+                "completion_timestamp": self.completion_timestamp
+                # FIXME: format timestamp to string here or flask can handle it by itself?
+            }

@@ -3,7 +3,7 @@
 import argparse
 import logging
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, abort, jsonify
 
 from db.dao.assignments_dao import AssignmentDao
 from db.dao.student_dao import StudentDao
@@ -27,7 +27,7 @@ def get_arguments():
     return parser.parse_args()
 
 
-"""CONFIGURATION """
+"""APP CONFIGURATION """
 options = get_arguments()
 app = Flask(__name__)
 logging.basicConfig(format='[%(asctime)s %(levelname)s]: %(message)s',
@@ -53,7 +53,7 @@ DB_TEST_DATA_FILE = './db/data.sql'
 db.init_schema(DB_SCHEMA_FILE)
 db.init_test_data(DB_TEST_DATA_FILE)
 
-"""DATABASE LAYER INITIALIZATION"""
+"""DATA ACCESS OBJECTS"""
 # tasks crud operations
 task_dao = TaskDao(db_host=DB_HOST,
                    username=DB_USERNAME,
@@ -73,11 +73,60 @@ assignment_dao = AssignmentDao(db_host=DB_HOST,
                                db_name=DB_NAME,
                                log_level=options.log_level)
 
-"""ROUTES AND HANDLERS"""
-
-
 # when we reach here, we should already have an initialized database layer
+"""ROUTES AND HANDLERS"""
+API_PREFIX = '/api/v1'
+STUDENTS_URL = API_PREFIX + '/students'
 
+
+def bad_request(error_message):  # 400 - bad request ;)
+    abort(400, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
+
+
+def not_found(error_message):  # 404 - not found ;)
+    abort(404, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
+
+
+#### STUDENTS:
+# CREATE NEW STUDENTS
+@app.route(STUDENTS_URL, methods=['POST'])
+def create_student():
+    post_data = request.json
+    if not post_data:
+        bad_request("Either the request body is missing or json is incorrect")
+    if 'students' not in post_data:
+        bad_request("Missing 'students' list in the post data")
+    if len(post_data['students']) == 0:
+        bad_request('List of students cannot be empty. You have to send at least one username')
+
+    students = post_data['students']
+    logging.info('Create new student(s): %s' % students)
+
+    created_students = [s for s in students if student_dao.save(s)]
+    status_code = 201 if len(created_students) > 0 else 204  # 201 - created, 204 - no content ;)
+    return jsonify(created_students=created_students), status_code
+
+
+# GET STUDENTS
+@app.route(STUDENTS_URL, methods=['GET'])
+def get_student():
+    username = request.args.get('username')
+    # get one
+    if username:
+        if ';' in username or '#' in username or '|' in username or '--' in username:
+            bad_request('I can break rules, too. Goodbye')
+        logging.info("Get a student: %s" % username)
+        student = student_dao.get_by_username(username)
+        if not student:
+            not_found(f'Student "{username}" not found')
+        return jsonify(students=student.to_resource()), 200
+    # get all
+    if not username:
+        all_students = [s.to_resource() for s in student_dao.get_all()]
+        return jsonify(students=all_students), 200
+
+
+#### PUBLIC RESOURCES:
 @app.route('/')
 @app.route('/home')
 def home():
