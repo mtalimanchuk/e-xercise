@@ -117,14 +117,19 @@ def get_student():
             bad_request('I can break rules, too. Goodbye')
         logging.info("Get a student: %s" % username)
         student = student_dao.get_by_username(username)
+        tasks = task_dao.get_tasks_by(student.id)
         if not student:
             not_found(f'Student "{username}" not found')
-        return jsonify(students=student.to_resource()), 200
+        return jsonify(students={"student": student.to_resource(), "tasks": [t.to_resource() for t in tasks]}), 200
     # get all
     if not username:
         logging.info('Get all students')
-        all_students = [s.to_resource() for s in student_dao.get_all()]
-        return jsonify(students=all_students), 200
+        all_students = student_dao.get_all()
+        students_and_tasks = []
+        for s in all_students:
+            students_and_tasks.append(
+                {"student": s.to_resource(), "tasks": [t.to_resource() for t in task_dao.get_tasks_by(s.id)]})
+        return jsonify(students=students_and_tasks), 200
 
 
 #### PUBLIC RESOURCES:

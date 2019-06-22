@@ -34,6 +34,14 @@ class TaskDao(ClassroomDb):
         if raw_data:
             return self.row_mapper(raw_data)
 
+    def get_tasks_by(self, student_id):
+        super().validate_id(student_id, "student")
+        logging.debug('Get tasks of student with id: %s' % student_id)
+        query = "SELECT * FROM task WHERE EXISTS(SELECT 1 FROM assignment WHERE student_id = %s )" % student_id
+        raw_data = super().query_for_list(query)
+        if raw_data:
+            return [self.row_mapper(row) for row in raw_data]
+
     def get_all(self):
         logging.debug('Get all tasks')
         query = "SELECT * FROM task"
