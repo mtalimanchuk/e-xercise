@@ -121,14 +121,14 @@ def get_student():
             not_found(f'Student "{username}" not found')
         tasks = task_dao.get_tasks_by(student.id)
         return jsonify(students={"student": student.to_resource(),
-                                 "tasks": [t.to_resource() for t in tasks]}), 200
+                                 "tasks": [t.to_resource() for t in tasks or []]}), 200
     # get all
     if not username:
         logging.info('Get all students')
         all_students = student_dao.get_all()
         students_and_tasks = [
             {"student": s.to_resource(),
-             "tasks": [t.to_resource() for t in task_dao.get_tasks_by(s.id)]}
+             "tasks": [t.to_resource() for t in task_dao.get_tasks_by(s.id) or []]}
             for s in all_students
         ]
         return jsonify(students=students_and_tasks), 200
