@@ -125,10 +125,10 @@ def get_student():
     if not username:
         logging.info('Get all students')
         all_students = student_dao.get_all()
-        students_and_tasks = []
-        for s in all_students:
-            students_and_tasks.append(
-                {"student": s.to_resource(), "tasks": [t.to_resource() for t in task_dao.get_tasks_by(s.id)]})
+        students_and_tasks = [
+            {"student": s.to_resource(), "tasks": [t.to_resource() for t in task_dao.get_tasks_by(s.id)]}
+            for s in all_students
+        ]
         return jsonify(students=students_and_tasks), 200
 
 
