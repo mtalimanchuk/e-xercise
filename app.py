@@ -2,13 +2,8 @@
 
 import argparse
 import logging
-
+import os
 from flask import Flask, render_template, request, abort, jsonify
-
-from db.dao.assignments_dao import AssignmentDao
-from db.dao.student_dao import StudentDao
-from db.dao.task_dao import TaskDao
-from db.database import ClassroomDb
 
 """COMMAND LINE ARGUMENTS"""
 
@@ -33,45 +28,29 @@ app = Flask(__name__)
 logging.basicConfig(format='[%(asctime)s %(levelname)s]: %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
                     level=options.log_level)
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 """DATABASE CONNECTION PROPERTIES """
-# FIXME: replace with a config file
+# FIXME: replace with a env variable
+
 DB_HOST = 'localhost'
 DB_USERNAME = 'classroom'
 DB_PASSWORD = 'classroom'
 DB_NAME = 'classroom_db'
+class Config(object):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+                              'mariadb://' + DB_HOST + ':3306/' + DB_NAME
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-# FIXME: this is for the dev environment and should be removed before going live
-db = ClassroomDb(db_host=DB_HOST,
-                 username=DB_USERNAME,
-                 password=DB_PASSWORD,
-                 db_name=DB_NAME,
-                 log_level=options.log_level)
-DB_SCHEMA_FILE = './db/schema.sql'
-DB_TEST_DATA_FILE = './db/data.sql'
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
-db.init_schema(DB_SCHEMA_FILE)
-db.init_test_data(DB_TEST_DATA_FILE)
+config = Config()
+app.config.from_object(config)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
-"""DATA ACCESS OBJECTS"""
-# tasks crud operations
-task_dao = TaskDao(db_host=DB_HOST,
-                   username=DB_USERNAME,
-                   password=DB_PASSWORD,
-                   db_name=DB_NAME,
-                   log_level=options.log_level)
-# students crud operations
-student_dao = StudentDao(db_host=DB_HOST,
-                         username=DB_USERNAME,
-                         password=DB_PASSWORD,
-                         db_name=DB_NAME,
-                         log_level=options.log_level)
-# assignments tasks to students crud operations
-assignment_dao = AssignmentDao(db_host=DB_HOST,
-                               username=DB_USERNAME,
-                               password=DB_PASSWORD,
-                               db_name=DB_NAME,
-                               log_level=options.log_level)
+
 
 # when we reach here, we should already have an initialized database layer
 """ROUTES AND HANDLERS"""
