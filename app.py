@@ -2,9 +2,11 @@
 
 import argparse
 import logging
-import os
-from flask import Flask, render_template, request, abort, jsonify
+from flask import jsonify
 
+from flask import Flask, render_template, abort
+import sys,os
+sys.path.append(os.getcwd())
 """COMMAND LINE ARGUMENTS"""
 
 
@@ -37,10 +39,13 @@ DB_HOST = 'localhost'
 DB_USERNAME = 'classroom'
 DB_PASSWORD = 'classroom'
 DB_NAME = 'classroom_db'
+
+
 class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
                               'mariadb://' + DB_HOST + ':3306/' + DB_NAME
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -50,13 +55,69 @@ app.config.from_object(config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-
-
 # when we reach here, we should already have an initialized database layer
 """ROUTES AND HANDLERS"""
 API_PREFIX = '/api/v1'
 STUDENTS_URL = API_PREFIX + '/students'
 
+LIST_ENTITY_NAME = 'List'
+LIST_REFERENCE = 'list.id'
+LIST_BACK_REFERENCE = 'list'
+
+SENTENCE_ENTITY_NAME = 'Sentence'
+SENTENCE_REFERENCE = 'sentence.id'
+SENTENCE_BACK_REFERENCE = 'sentence'
+
+EXERCISE_ENTITY_NAME = 'Exercise'
+EXERCISE_REFERENCE = 'exercise.id'
+EXERCISE_BACK_REFERENCE = 'exercise'
+
+TASKS_ENTITY_NAME = 'Task'
+
+
+class Sentence(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    lang = db.Column(db.String(3), index=True, nullable=False)
+    text = db.Column(db.String(1024), index=True, nullable=False)
+    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
+    exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=True)
+
+
+class List(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    name = db.Column(db.String(300), nullable=False)
+
+    sentences = db.relationship(SENTENCE_ENTITY_NAME, backref=LIST_BACK_REFERENCE, lazy=True)
+
+
+class Exercise(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    student_url = db.Column(db.String(30), unique=True, nullable=False)
+    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
+    expiration_datetime = db.Column(db.TIMESTAMP, nullable=False)
+
+    sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
+    tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
+
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=False, unique=True)
+    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
+    correct_answer = db.Column(db.String(50), nullable=False)
+    task_input = db.Column(db.String(50), nullable=True)
+    is_completed = db.Column(db.Boolean, default=False)
+    failed_attempts = db.Column(db.Integer, nullable=False, default=0)
+
+
+class SentenceToList(db.Model):
+    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_ENTITY_NAME), nullable=False)
+    list_id = db.Column(db.Integer, db.ForeignKey(LIST_ENTITY_NAME), nullable=False)
+
+    __table_args__ = (
+        db.PrimaryKeyConstraint(sentence_id, list_id),
+        {}
+    )
 
 def bad_request(error_message):
     abort(400, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
@@ -65,59 +126,19 @@ def bad_request(error_message):
 def not_found(error_message):
     abort(404, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
 
-
-#### STUDENTS:
-# CREATE NEW STUDENTS
-@app.route(STUDENTS_URL, methods=['POST'])
-def create_student():
-    post_data = request.json
-    if not post_data:
-        bad_request("Either the request body is missing or json is incorrect")
-    if 'students' not in post_data:
-        bad_request("Missing 'students' list in the post data")
-    if len(post_data['students']) == 0:
-        bad_request('List of students cannot be empty. You have to send at least one username')
-
-    students = post_data['students']
-    logging.info('Create new student(s): %s' % students)
-
-    created_students = [s for s in students if student_dao.save(s)]
-    status_code = 201 if len(created_students) > 0 else 204  # 201 - created, 204 - no content ;)
-    return jsonify(created_students=created_students), status_code
-
-
-# GET STUDENTS
-@app.route(STUDENTS_URL, methods=['GET'])
-def get_student():
-    username = request.args.get('username')
-    # get one
-    if username:
-        if ';' in username or '#' in username or '|' in username or '--' in username:
-            bad_request('I can break rules, too. Goodbye')
-        logging.info("Get a student: %s" % username)
-        student = student_dao.get_by_username(username)
-        if not student:
-            not_found(f'Student "{username}" not found')
-        tasks = task_dao.get_tasks_by(student.id)
-        return jsonify(students={"student": student.to_resource(),
-                                 "tasks": [t.to_resource() for t in tasks or []]}), 200
-    # get all
-    if not username:
-        logging.info('Get all students')
-        all_students = student_dao.get_all()
-        students_and_tasks = [
-            {"student": s.to_resource(),
-             "tasks": [t.to_resource() for t in task_dao.get_tasks_by(s.id) or []]}
-            for s in all_students
-        ]
-        return jsonify(students=students_and_tasks), 200
-
+def ok(message):
+    return jsonify({'message': message}), 200
 
 #### PUBLIC RESOURCES:
 @app.route('/')
 @app.route('/home')
 def home():
     return render_template('home.html')
+
+@app.route('/exercise', methods=['GET'])
+def exercise():
+    sentence = Sentence(id=1, lang='aaa', text='aaa')
+    return ok(sentence)
 
 
 if __name__ == '__main__':
