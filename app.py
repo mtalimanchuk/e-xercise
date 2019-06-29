@@ -1,49 +1,37 @@
 #!/usr/bin/python3
 
-import argparse
 import logging
-from flask import jsonify
+import os
+import sys
 
 from flask import Flask, render_template, abort
-import sys,os
+from flask import jsonify
+
 sys.path.append(os.getcwd())
-"""COMMAND LINE ARGUMENTS"""
-
-
-def get_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--ip', dest='ip', default='127.0.0.1',
-                        help='Optional. IP address to bind the server to. Default is 127.0.0.1')
-    parser.add_argument('-p', '--port', dest='port', default=5000,
-                        help='Optional. Port to listen for the server. Default is 5000/tcp')
-    parser.add_argument('-l', '--logging', dest='log_level', default=logging.INFO,
-                        choices=['INFO', 'DEBUG', 'WARN', 'ERROR'],
-                        help='Optional. Logging level to use in application. '
-                             'Can be one of the following: [INFO, DEBUG, WARN, ERROR]. Default is INFO.')
-
-    return parser.parse_args()
-
 
 """APP CONFIGURATION """
-options = get_arguments()
+ip = '127.0.0.1'
+port = 5000
+
 app = Flask(__name__)
 logging.basicConfig(format='[%(asctime)s %(levelname)s]: %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
-                    level=options.log_level)
+                    level='INFO')
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 """DATABASE CONNECTION PROPERTIES """
-# FIXME: replace with a env variable
 
 DB_HOST = 'localhost'
 DB_USERNAME = 'classroom'
 DB_PASSWORD = 'classroom'
 DB_NAME = 'classroom_db'
 
+DB_URL = os.environ.get('DATABASE_URL') or \
+         'mysql://' + DB_USERNAME + ":" + DB_PASSWORD + "@" + DB_HOST + ':3306/' + DB_NAME
+
 
 class Config(object):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'mysql://' + DB_USERNAME + ":" + DB_PASSWORD + "@" + DB_HOST + ':3306/' + DB_NAME
+    SQLALCHEMY_DATABASE_URI = DB_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -73,7 +61,7 @@ TASKS_ENTITY_NAME = 'Task'
 class Sentence(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     lang = db.Column(db.String(3), index=True, nullable=False)
-    text = db.Column(db.String(100), index=True, nullable=False)
+    text = db.Column(db.Text(42940000), nullable=False)
     list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
     exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=True)
 
@@ -116,13 +104,9 @@ class SentenceToList(db.Model):
 
 migrate = Migrate(app, db)
 
-db.create_all()
-
-
 # when we reach here, we should already have an initialized database layer
 """ROUTES AND HANDLERS"""
 API_PREFIX = '/api/v1'
-STUDENTS_URL = API_PREFIX + '/students'
 
 
 def bad_request(error_message):
@@ -148,4 +132,4 @@ def exercise():
 
 
 if __name__ == '__main__':
-    app.run(host=options.ip, port=options.port)
+    app.run(host=ip, port=port)
