@@ -125,10 +125,10 @@ def ok(message):
 @app.route("/")
 @app.route("/index")
 def index():
-    return '<a href="/exercise_TestLink">Test</a>'
+    return '<a href="/exercise/TestLink">Test</a>'
 
 
-@app.route("/exercise_<exercise_link>")
+@app.route("/exercise/<exercise_link>")
 def exercise(exercise_link):
     return render_template("exercise.html", exercise_link=exercise_link)
 
@@ -143,17 +143,12 @@ def check():
     payload = json.loads(request.data.decode('utf-8'))
     task_id = payload["task_id"]
     task_answer = payload["task_answer"]
-    print(payload)
+    app.logger.info(payload)
     # TODO remove contraction sensitivity (parse "'m" as "am" and so on)
 
     submit_result = check_answer_in_db(task_id, task_answer)
 
     return jsonify(id=task_id, result=submit_result)
-
-# @app.route('/exercise', methods=['GET'])
-# def exercise():
-#     sentence = Sentence(id=1, lang='aaa', text='aaa')
-#     return ok(sentence)
 
 
 if __name__ == '__main__':
