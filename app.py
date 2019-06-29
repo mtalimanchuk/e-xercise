@@ -4,8 +4,9 @@ import logging
 import os
 import sys
 
-from flask import Flask, render_template, abort
-from flask import jsonify
+from flask import Flask, render_template, abort, jsonify
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 sys.path.append(os.getcwd())
 
@@ -34,9 +35,6 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = DB_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 
 config = Config()
 app.config.from_object(config)
@@ -102,6 +100,7 @@ class SentenceToList(db.Model):
         {}
     )
 
+
 migrate = Migrate(app, db)
 
 # when we reach here, we should already have an initialized database layer
@@ -116,14 +115,17 @@ def bad_request(error_message):
 def not_found(error_message):
     abort(404, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
 
+
 def ok(message):
     return jsonify({'message': message}), 200
+
 
 #### PUBLIC RESOURCES:
 @app.route('/')
 @app.route('/home')
 def home():
     return render_template('home.html')
+
 
 @app.route('/exercise', methods=['GET'])
 def exercise():
