@@ -43,7 +43,7 @@ DB_NAME = 'classroom_db'
 
 class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'mariadb://' + DB_HOST + ':3306/' + DB_NAME
+                              'mysql://' + DB_USERNAME + ":" + DB_PASSWORD + "@" + DB_HOST + ':3306/' + DB_NAME
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -53,13 +53,8 @@ from flask_migrate import Migrate
 config = Config()
 app.config.from_object(config)
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
-# when we reach here, we should already have an initialized database layer
-"""ROUTES AND HANDLERS"""
-API_PREFIX = '/api/v1'
-STUDENTS_URL = API_PREFIX + '/students'
-
+"""ORM"""
 LIST_ENTITY_NAME = 'List'
 LIST_REFERENCE = 'list.id'
 LIST_BACK_REFERENCE = 'list'
@@ -78,7 +73,7 @@ TASKS_ENTITY_NAME = 'Task'
 class Sentence(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     lang = db.Column(db.String(3), index=True, nullable=False)
-    text = db.Column(db.String(1024), index=True, nullable=False)
+    text = db.Column(db.String(100), index=True, nullable=False)
     list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
     exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=True)
 
@@ -111,13 +106,24 @@ class Task(db.Model):
 
 
 class SentenceToList(db.Model):
-    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_ENTITY_NAME), nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_ENTITY_NAME), nullable=False)
+    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
+    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=False)
 
     __table_args__ = (
         db.PrimaryKeyConstraint(sentence_id, list_id),
         {}
     )
+
+migrate = Migrate(app, db)
+
+db.create_all()
+
+
+# when we reach here, we should already have an initialized database layer
+"""ROUTES AND HANDLERS"""
+API_PREFIX = '/api/v1'
+STUDENTS_URL = API_PREFIX + '/students'
+
 
 def bad_request(error_message):
     abort(400, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json

@@ -8,3 +8,4 @@ setuptools
 pymysql
 Flask-SQLAlchemy
 Flask-Migrate
+Flask-pymysql
