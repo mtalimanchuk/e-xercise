@@ -135,7 +135,6 @@ def exercise(exercise_link):
 
 @app.route("/check", methods=["POST"])
 def check():
-
     ANSWERS = {'task1': 'am', 'task2': 'were'}
     check_answer_in_db = lambda _id, _answer: ANSWERS[_id] == _answer
 
@@ -149,6 +148,103 @@ def check():
     submit_result = check_answer_in_db(task_id, task_answer)
 
     return jsonify(id=task_id, result=submit_result)
+
+
+import re
+
+TATOEBA_SEL = 'body > div > div.container > div > div.section > div.sentence-and-translations > div'
+ID_SEL = 'md-subheader > a'
+TEXT_SEL = 'div.sentence > div.text'
+
+DEFAULT_TATOEBA_PARAMS = {
+    'from': 'eng',
+    'to': 'und',
+    'orphans': 'no',
+    'unapproved': 'no',
+    'native': '',
+    'user': '',
+    'tags': '',
+    'list': '907',
+    'has_audio': '',
+    'trans_filter': 'limit',
+    'trans_to': 'und',
+    'trans_link': '',
+    'trans_user': '',
+    'trans_orphan': '',
+    'trans_unapproved': '',
+    'trans_has_audio': '',
+    'sort': 'words',
+    'sort_reverse': 'yes'
+}
+import requests_html
+
+def scrape_tatoeba_sentences(raw_query, **kwargs):
+    max_pages = kwargs.pop('max_pages', 2)
+    # TODO pagination (parameter max_pages)
+    query_translator = {
+        ' ': '+',
+        '\(': '%28',
+        '\|': '%7C',
+        '\)': '%29',
+        '\^': '%5E',
+        '\$': '%24',
+        '\?': '%3F'
+        # add more?
+    }
+    query = raw_query
+    for key, value in query_translator.items():
+        query = re.sub(key, value, query)
+    prefix = f"https://tatoeba.org/eng/sentences/search?query={query}&"
+    if len(kwargs) == 0:
+        kwargs = DEFAULT_TATOEBA_PARAMS
+    url = prefix + '&'.join([f"{arg}={kwargs[arg]}" for arg in kwargs])
+    app.logger.info('Scraping tatoeba for %s' % url)
+    session = requests_html.HTMLSession(verify=False)
+    r = session.get(url)
+    if r.status_code == 200:
+        app.logger.info('OK')
+        response_translator = {
+            r'</span>': '>',
+            r'<span class="match">': '<',
+            r'<div class="text" flex="" dir="ltr">\n {2,}| *</div>': ''
+        }
+        sentences = []
+        for element in r.html.find(TATOEBA_SEL):
+            try:
+                (link,) = element.find(ID_SEL)[0].absolute_links
+                id = link.split("/")[-1]
+                text = element.find(TEXT_SEL)[0].html
+                for key, value in response_translator.items():
+                    text = re.sub(key, value, text)
+                sentence = {'id': id, 'phrase': raw_query, 'text': text}
+
+                # FIXME: replace text field with a json of sentence
+
+                sentences.append(text)
+            except IndexError:
+                pass
+
+        return sentences
+    else:
+        app.logger.warning('Cannot reach tatoeba for some reason')
+        return None
+
+
+@app.route("/exercise/generate", methods=['POST'])
+def generate():
+    post_data = request.data.decode('utf-8')
+    if not post_data or post_data == '':
+        bad_request('Either the request body is missing, or json is incorrect.')
+    queries = []
+    try:
+        queries = json.loads(request.data.decode('utf-8'))['queries']
+    except Exception as e:
+        bad_request('JSON cannot be decoded: %s' % e)
+    app.logger.info('New search queries: %s' % queries)
+
+    sentences = [scrape_tatoeba_sentences(s) for s in queries]
+
+    return jsonify(sentences=sentences), 200
 
 
 if __name__ == '__main__':
