@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
+import json
 import logging
 import os
 import sys
 
-from flask import Flask, render_template, abort, jsonify
+from flask import Flask, render_template, abort, jsonify, request
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -121,16 +122,33 @@ def ok(message):
 
 
 #### PUBLIC RESOURCES:
-@app.route('/')
-@app.route('/home')
-def home():
-    return render_template('home.html')
+@app.route("/")
+@app.route("/index")
+def index():
+    return '<a href="/exercise/TestLink">Test</a>'
 
 
-@app.route('/exercise', methods=['GET'])
-def exercise():
-    sentence = Sentence(id=1, lang='aaa', text='aaa')
-    return ok(sentence)
+@app.route("/exercise/<exercise_link>")
+def exercise(exercise_link):
+    return render_template("exercise.html", exercise_link=exercise_link)
+
+
+@app.route("/check", methods=["POST"])
+def check():
+
+    ANSWERS = {'task1': 'am', 'task2': 'were'}
+    check_answer_in_db = lambda _id, _answer: ANSWERS[_id] == _answer
+
+    # https://javascript.info/bubbling-and-capturing
+    payload = json.loads(request.data.decode('utf-8'))
+    task_id = payload["task_id"]
+    task_answer = payload["task_answer"]
+    app.logger.info(payload)
+    # TODO remove contraction sensitivity (parse "'m" as "am" and so on)
+
+    submit_result = check_answer_in_db(task_id, task_answer)
+
+    return jsonify(id=task_id, result=submit_result)
 
 
 if __name__ == '__main__':
