@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
+import json
 import logging
 import os
 import sys
 
-from flask import Flask, render_template, abort, jsonify
+from flask import Flask, render_template, abort, jsonify, request
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -38,7 +39,7 @@ class Config(object):
 
 config = Config()
 app.config.from_object(config)
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
 
 """ORM"""
 LIST_ENTITY_NAME = 'List'
@@ -56,52 +57,52 @@ EXERCISE_BACK_REFERENCE = 'exercise'
 TASKS_ENTITY_NAME = 'Task'
 
 
-class Sentence(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    lang = db.Column(db.String(3), index=True, nullable=False)
-    text = db.Column(db.Text(42940000), nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
-    exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=True)
-
-
-class List(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    name = db.Column(db.String(300), nullable=False)
-
-    sentences = db.relationship(SENTENCE_ENTITY_NAME, backref=LIST_BACK_REFERENCE, lazy=True)
-
-
-class Exercise(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    student_url = db.Column(db.String(30), unique=True, nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
-    expiration_datetime = db.Column(db.TIMESTAMP, nullable=False)
-
-    sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
-    tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
-
-
-class Task(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=False, unique=True)
-    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
-    correct_answer = db.Column(db.String(50), nullable=False)
-    task_input = db.Column(db.String(50), nullable=True)
-    is_completed = db.Column(db.Boolean, default=False)
-    failed_attempts = db.Column(db.Integer, nullable=False, default=0)
-
-
-class SentenceToList(db.Model):
-    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=False)
-
-    __table_args__ = (
-        db.PrimaryKeyConstraint(sentence_id, list_id),
-        {}
-    )
-
-
-migrate = Migrate(app, db)
+# class Sentence(db.Model):
+#     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+#     lang = db.Column(db.String(3), index=True, nullable=False)
+#     text = db.Column(db.Text(42940000), nullable=False)
+#     list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
+#     exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=True)
+#
+#
+# class List(db.Model):
+#     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+#     name = db.Column(db.String(300), nullable=False)
+#
+#     sentences = db.relationship(SENTENCE_ENTITY_NAME, backref=LIST_BACK_REFERENCE, lazy=True)
+#
+#
+# class Exercise(db.Model):
+#     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+#     student_url = db.Column(db.String(30), unique=True, nullable=False)
+#     list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
+#     expiration_datetime = db.Column(db.TIMESTAMP, nullable=False)
+#
+#     sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
+#     tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
+#
+#
+# class Task(db.Model):
+#     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+#     exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=False, unique=True)
+#     sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
+#     correct_answer = db.Column(db.String(50), nullable=False)
+#     task_input = db.Column(db.String(50), nullable=True)
+#     is_completed = db.Column(db.Boolean, default=False)
+#     failed_attempts = db.Column(db.Integer, nullable=False, default=0)
+#
+#
+# class SentenceToList(db.Model):
+#     sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
+#     list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=False)
+#
+#     __table_args__ = (
+#         db.PrimaryKeyConstraint(sentence_id, list_id),
+#         {}
+#     )
+#
+#
+# migrate = Migrate(app, db)
 
 # when we reach here, we should already have an initialized database layer
 """ROUTES AND HANDLERS"""
@@ -121,16 +122,38 @@ def ok(message):
 
 
 #### PUBLIC RESOURCES:
-@app.route('/')
-@app.route('/home')
-def home():
-    return render_template('home.html')
+@app.route("/")
+@app.route("/index")
+def index():
+    return '<a href="/exercise_TestLink">Test</a>'
 
 
-@app.route('/exercise', methods=['GET'])
-def exercise():
-    sentence = Sentence(id=1, lang='aaa', text='aaa')
-    return ok(sentence)
+@app.route("/exercise_<exercise_link>")
+def exercise(exercise_link):
+    return render_template("exercise.html", exercise_link=exercise_link)
+
+
+@app.route("/check", methods=["POST"])
+def check():
+
+    ANSWERS = {'task1': 'am', 'task2': 'were'}
+    check_answer_in_db = lambda _id, _answer: ANSWERS[_id] == _answer
+
+    # https://javascript.info/bubbling-and-capturing
+    payload = json.loads(request.data.decode('utf-8'))
+    task_id = payload["task_id"]
+    task_answer = payload["task_answer"]
+    print(payload)
+    # TODO remove contraction sensitivity (parse "'m" as "am" and so on)
+
+    submit_result = check_answer_in_db(task_id, task_answer)
+
+    return jsonify(id=task_id, result=submit_result)
+
+# @app.route('/exercise', methods=['GET'])
+# def exercise():
+#     sentence = Sentence(id=1, lang='aaa', text='aaa')
+#     return ok(sentence)
 
 
 if __name__ == '__main__':
