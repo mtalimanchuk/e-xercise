@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import socket
 import sys
 
 from flask import Flask, render_template, abort, jsonify, request
@@ -14,6 +15,8 @@ sys.path.append(os.getcwd())
 """APP CONFIGURATION """
 ip = '127.0.0.1'
 port = 5000
+hostname = socket.gethostbyaddr(ip)[0]
+transport_schema = 'http'
 
 app = Flask(__name__)
 logging.basicConfig(format='[%(asctime)s %(levelname)s]: %(message)s',
@@ -75,10 +78,10 @@ class List(db.Model):
 class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     student_url = db.Column(db.String(30), unique=True, nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
-    expiration_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    # list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE))
+    # expiration_datetime = db.Column(db.TIMESTAMP, nullable=False)
 
-    sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
+    # sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
     tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
 
 
@@ -178,6 +181,7 @@ DEFAULT_TATOEBA_PARAMS = {
 }
 import requests_html
 
+
 def scrape_tatoeba_sentences(raw_query, **kwargs):
     max_pages = kwargs.pop('max_pages', 2)
     # TODO pagination (parameter max_pages)
@@ -220,7 +224,7 @@ def scrape_tatoeba_sentences(raw_query, **kwargs):
 
                 # FIXME: replace text field with a json of sentence
 
-                sentences.append(text)
+                sentences.append(text.split('\n')[1].strip())
             except IndexError:
                 pass
 
@@ -245,6 +249,53 @@ def generate():
     sentences = [scrape_tatoeba_sentences(s) for s in queries]
 
     return jsonify(sentences=sentences), 200
+
+
+import uuid
+
+
+
+
+
+
+def save_exercise(sentences):
+    def get_random_string(string_length=10):
+        """Returns a random string of length string_length."""
+        random = str(uuid.uuid4())  # Convert UUID format to a Python string.
+        random = random.replace("-", "")  # Remove the UUID '-'.
+        return random[0:string_length]  # Return the random string.
+
+    def save_task(sentence):
+        pass
+
+    app.logger.info('Storing tasks...')
+    for s in sentences:
+        save_task(s)
+    unique_url = get_random_string(string_length=50)
+    app.logger.info('Creating new exercise...')
+
+    exercise = Exercise()
+
+    return unique_url
+
+
+@app.route('/exercise/submit', methods=['PUT'])
+def submit():
+    post_data = request.json
+    if not post_data:
+        bad_request("Either the request body is missing or json is incorrect")
+    if 'sentences' not in post_data:
+        bad_request("Missing 'sentences' list in the post data")
+    sentences = post_data['sentences']
+    sentences_count = len(sentences)
+    if sentences_count == 0:
+        bad_request('Sentences list cannot be empty')
+
+    app.logger.info("Submitting %s new sentence(s)" % sentences_count)
+    unique_url = save_exercise(sentences=sentences)
+    return jsonify(
+        student_url=f"{transport_schema}://{hostname}:{port}/exercise/{unique_url}",
+        tasks=sentences_count), 201
 
 
 if __name__ == '__main__':
