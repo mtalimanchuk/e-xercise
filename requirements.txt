@@ -6,3 +6,6 @@ Werkzeug
 itsdangerous
 setuptools
 pymysql
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-pymysql
