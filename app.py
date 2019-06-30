@@ -45,10 +45,6 @@ app.config.from_object(config)
 db = SQLAlchemy(app)
 
 """ORM"""
-LIST_ENTITY_NAME = 'List'
-LIST_REFERENCE = 'list.id'
-LIST_BACK_REFERENCE = 'list'
-
 SENTENCE_ENTITY_NAME = 'Sentence'
 SENTENCE_REFERENCE = 'sentence.id'
 SENTENCE_BACK_REFERENCE = 'sentence'
@@ -62,47 +58,25 @@ TASKS_ENTITY_NAME = 'Task'
 
 class Sentence(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    lang = db.Column(db.String(3), index=True, nullable=False)
-    text = db.Column(db.Text(42940000), nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=True)
     exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=True)
-
-
-class List(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    name = db.Column(db.String(300), nullable=False)
-
-    sentences = db.relationship(SENTENCE_ENTITY_NAME, backref=LIST_BACK_REFERENCE, lazy=True)
+    text = db.Column(db.Text(42940000), nullable=False)
 
 
 class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    student_url = db.Column(db.String(30), unique=True, nullable=False)
-    # list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE))
-    # expiration_datetime = db.Column(db.TIMESTAMP, nullable=False)
+    student_url = db.Column(db.String(50), unique=True, nullable=False)
 
     # sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
-    tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
+    # tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
 
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    exercise_id = db.Column(db.Integer, db.ForeignKey(EXERCISE_REFERENCE), nullable=False, unique=True)
     sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
     correct_answer = db.Column(db.String(50), nullable=False)
     task_input = db.Column(db.String(50), nullable=True)
-    is_completed = db.Column(db.Boolean, default=False)
+    is_completed = db.Column(db.Boolean, nullable=False, default=False)
     failed_attempts = db.Column(db.Integer, nullable=False, default=0)
-
-
-class SentenceToList(db.Model):
-    sentence_id = db.Column(db.Integer, db.ForeignKey(SENTENCE_REFERENCE), nullable=False)
-    list_id = db.Column(db.Integer, db.ForeignKey(LIST_REFERENCE), nullable=False)
-
-    __table_args__ = (
-        db.PrimaryKeyConstraint(sentence_id, list_id),
-        {}
-    )
 
 
 migrate = Migrate(app, db)
@@ -254,27 +228,53 @@ def generate():
 import uuid
 
 
+def extract_tasks(sentence):
+    parts = re.split(r"(<.*?>)", sentence)
+    for part in parts:
+        if part.startswith("<") and part.endswith(">"):
+            task = part[1:-1]
+            yield task
 
 
+def save_sentence(sentence, exercise_id):
+    entity = Sentence(text=sentence, exercise_id=exercise_id)
+    db.session.add(entity)
+    db.session.commit()
+    return entity.id
 
 
-def save_exercise(sentences):
+def save_task(task, sentence_id):
+    entity = Task(correct_answer=task, sentence_id=sentence_id)
+    db.session.add(entity)
+    db.session.commit()
+    return entity.id
+
+
+def save_exercise(unique_url):
+    exercise = Exercise(student_url=unique_url)
+    db.session.add(exercise)
+    db.session.commit()
+    return exercise.id
+
+
+def create_exercise(sentences):
     def get_random_string(string_length=10):
         """Returns a random string of length string_length."""
         random = str(uuid.uuid4())  # Convert UUID format to a Python string.
         random = random.replace("-", "")  # Remove the UUID '-'.
         return random[0:string_length]  # Return the random string.
 
-    def save_task(sentence):
-        pass
-
-    app.logger.info('Storing tasks...')
-    for s in sentences:
-        save_task(s)
     unique_url = get_random_string(string_length=50)
-    app.logger.info('Creating new exercise...')
 
-    exercise = Exercise()
+    app.logger.info('Create new exercise')
+    exercise_id = save_exercise(unique_url)
+    app.logger.info("New exercise with id: %s" % exercise_id)
+    for s in sentences:
+        sentence_id = save_sentence(s, exercise_id)
+        tasks = [r for r in extract_tasks(s)]
+        app.logger.info('Storing tasks for sentence with id %s / exercise id: %s', sentence_id, exercise_id)
+        for t in tasks:
+            save_task(t, sentence_id)
 
     return unique_url
 
@@ -292,7 +292,7 @@ def submit():
         bad_request('Sentences list cannot be empty')
 
     app.logger.info("Submitting %s new sentence(s)" % sentences_count)
-    unique_url = save_exercise(sentences=sentences)
+    unique_url = create_exercise(sentences=sentences)
     return jsonify(
         student_url=f"{transport_schema}://{hostname}:{port}/exercise/{unique_url}",
         tasks=sentences_count), 201
