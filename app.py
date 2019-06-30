@@ -66,9 +66,6 @@ class Exercise(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     student_url = db.Column(db.String(50), unique=True, nullable=False)
 
-    # sentences = db.relationship(EXERCISE_ENTITY_NAME, backref=SENTENCE_BACK_REFERENCE, lazy=True)
-    # tasks = db.relationship(TASKS_ENTITY_NAME, backref=EXERCISE_BACK_REFERENCE, lazy=False)
-
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
@@ -77,6 +74,13 @@ class Task(db.Model):
     task_input = db.Column(db.String(50), nullable=True)
     is_completed = db.Column(db.Boolean, nullable=False, default=False)
     failed_attempts = db.Column(db.Integer, nullable=False, default=0)
+
+
+def get_exercise(exercise_link):
+    exercise = db.session.query(Exercise).filter(Exercise.student_url == exercise_link).first()
+    sentences = db.session.query(Sentence).filter(Sentence.exercise_id == exercise.id).all()
+    tasks = [db.session.query(Task).filter(Task.sentence_id == sentence.id).all() for sentence in sentences]
+    return exercise, sentences, tasks
 
 
 migrate = Migrate(app, db)
@@ -96,13 +100,6 @@ def not_found(error_message):
 
 def ok(message):
     return jsonify({'message': message}), 200
-
-
-def get_exercise(exercise_link):
-    exercise = db.session.query(Exercise).filter(Exercise.student_url == exercise_link).first()
-    sentences = db.session.query(Sentence).filter(Sentence.exercise_id == exercise.id).all()
-    tasks = [db.session.query(Task).filter(Task.sentence_id == sentence.id).all() for sentence in sentences]
-    return exercise, sentences, tasks
 
 
 #### PUBLIC RESOURCES:
