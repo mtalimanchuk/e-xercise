@@ -98,6 +98,13 @@ def ok(message):
     return jsonify({'message': message}), 200
 
 
+def get_exercise(exercise_link):
+    exercise = db.session.query(Exercise).filter(Exercise.student_url == exercise_link).first()
+    sentences = db.session.query(Sentence).filter(Sentence.exercise_id == exercise.id).all()
+    tasks = [db.session.query(Task).filter(Task.sentence_id == sentence.id).all() for sentence in sentences]
+    return exercise, sentences, tasks
+
+
 #### PUBLIC RESOURCES:
 @app.route("/")
 @app.route("/index")
@@ -107,6 +114,10 @@ def index():
 
 @app.route("/exercise/<exercise_link>")
 def exercise(exercise_link):
+    exercise, sentences, tasks = get_exercise(exercise_link)
+    app.logger.info(exercise)
+    app.logger.info(sentences)
+    app.logger.info(tasks)
     return render_template("exercise.html", exercise_link=exercise_link)
 
 
