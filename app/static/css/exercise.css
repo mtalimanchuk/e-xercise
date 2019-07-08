@@ -1,0 +1,27 @@
+#progress-bar {
+  width: 100%;
+  margin: 10px auto;
+  height: 22px;
+  background-color: #0A5F44;
+}
+
+#progress-bar-remaining {
+  font-family: monospace;
+  font-size: 200%;
+  height: 100%;
+  text-align: justify;
+  padding: 0 0px;
+  line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+  width: 0%;
+  background-color: rgb(204, 235, 0);
+  box-sizing: border-box;
+}
+
+.exercise-bg {
+  font-family: sans-serif;
+  padding: 20px 5% 20px;
+}
+
+.exercise-bg input {
+  padding: 3px;
+}

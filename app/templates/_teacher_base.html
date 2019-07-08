@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Online Exercise Generator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/generator.css') }}">
+<script type="text/javascript" src="javascript/generator.js"></script>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="{{ url_for('index') }}">Help</a>
+  <a href="{{ url_for('sentence_generator') }}">Generator</a>
+  <a href="{{ url_for('text_lemmatizer') }}">Lemmatizer</a>
+</div>
+
+{% block content %}{% endblock %}
+
+{% block script %}{% endblock %}
+
+</body>
+</html>

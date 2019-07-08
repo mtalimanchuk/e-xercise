@@ -15,11 +15,19 @@ def ok(message):
     return jsonify({'message': message}), 200
 
 
-#### PUBLIC RESOURCES:
 @app.route("/")
 @app.route("/index")
 def index():
-    return '<a href="/exercise/TestLink">Test</a>'
+    return render_template("index.html")
+
+@app.route("/sentence_generator")
+def sentence_generator():
+    return render_template("generator.html")
+
+
+@app.route("/text_lemmatizer")
+def text_lemmatizer():
+    return render_template("lemmatizer.html")
 
 
 @app.route("/exercise/<exercise_link>")
