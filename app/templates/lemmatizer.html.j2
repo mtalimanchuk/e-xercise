@@ -1,5 +1,5 @@
 <!--@formatter:off-->
-{% extends '_base.html' %}
+{% extends '_teacher_base.html.j2' %}
 
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/lemmatizer.css') }}">
@@ -9,6 +9,7 @@
 </div>
 
 <span class="word-wrapper">Text</span>
+
 
 
 {% endblock %}

@@ -1,12 +1,16 @@
-{% extends '_student_base.html' %}
+{% extends '_student_base.html.j2' %}
 
 {% block content %}
 <p><h3>Sample exercise {{ exercise_link }}</h3></p>
 <hr>
 <form class="exerciseBg" id={{ exercise_link }}>
-  <p>I <input id="task1" autocomplete="off"><input type="submit" name="check-task" value="↵" task_id="task1"> sitting on the chair right now</p>
-  <p>They <input id="task2" autocomplete="off"><input type="submit" name="check-task" value="↵" task_id="task2"> playing basketball yesterday</p>
-
+  {% for entity in exercise_content %}
+    {% if entity.type == "kb_input" %}
+      <input id="{{ entity.task_id }}" autocomplete="off"><input type="submit" name="check-task" value="↵" task_id="{{ entity.task_id }}">
+    {% elif entity.type == "plaintext" %}
+      {{ entity.content }}
+    {% endif %}
+  {% endfor %}
 </form>
 {% endblock %}
 

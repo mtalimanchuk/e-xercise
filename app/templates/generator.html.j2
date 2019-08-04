@@ -1,0 +1,23 @@
+<!--@formatter:off-->
+{% extends '_teacher_base.html.j2' %}
+
+{% block content %}
+<div class="geninfo">
+  <h3>Markup rules</h3>
+  &lt; &gt; - Task wrapper. Contents may include<br>
+  <ul>
+  <li>| - delimiter for possible answers, e.g. He &lt;will|is going to&gt; play basketball tomorrow</li>
+  <li>() - input placeholder, e.g. She &lt;is(be)&gt; ready</li>
+  </ul>
+</div>
+<hr>
+
+<div class="genform">
+  <form action = "{{ url_for('generate_exercise') }}" method="post"><textarea name="gen_input" placeholder="One sentence per line" cols="50" rows="10"></textarea><br>
+  <input type="submit"></form>
+</div>
+
+<div class="genresult">
+</div>
+
+{% endblock %}
