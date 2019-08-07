@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Online Exercise Generator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<style media="screen">
+
+/* canvas.com/colors
+https://www.canva.com/colors/color-palettes/fly-me-away/  */
+  html {
+    background-color: #e8e3dd;
+  }
+
+  hr {
+    border: 0;
+    clear: both;
+    display: block;
+    width: 96%;
+    background-color: #bdb8b3;
+    height: 2px;
+  }
+
+  .exercise-page-grid {
+    display: grid;
+    grid-template-columns: 10% 1fr 10%;
+    grid-gap: 10px;
+    font: 1.2rem Tahoma, Geneva, sans-serif;
+    line-height: 1.6;
+  }
+
+  .header {
+    grid-column: 1 / 4;
+    color: white;
+    background-color: #2b333d;
+    font-size: 120%;
+    padding: 40px 10px 10px 40px;
+    text-shadow: 1px 1px 1px black;
+  }
+
+  .exercise-container {
+    grid-column: 2 / 3;
+    display: grid;
+    grid-gap: 20px;
+    background-color: white;
+    border: 1px outset #62b0df;
+    border-radius: 2px;
+    padding: 10px;
+  }
+
+  .exercise-howto {
+    color: #fd812d;
+    font-size: 130%;
+    line-height: 1;
+    padding: 2% 2% 0 2%;
+    text-shadow: 1px 1px 1px #8acff0;
+  }
+
+  .task-context {
+    padding: 0 5% 0 5%;
+  }
+
+  .task-context input[type=text] {
+    border: 2px inset;
+    border-color: #62b0df;
+    border-radius: 3px;
+    font: 1rem Tahoma, Geneva, sans-serif;
+    padding-left: 7px;
+    vertical-align: middle;
+    width: 80px;
+  }
+
+  .task-context input[type=submit] {
+    background-color: white;
+    border: 2px outset;
+    border-color: #62b0df;
+    border-radius: 3px;
+    color: #62b0df;
+    font-weight: bold;
+    height: 24px;
+    width: 25px;
+    padding: 0px;
+    /* text-shadow: 0.5px 0.5px 0px black; */
+    vertical-align: middle;
+  }
+
+  #task2 {
+    border-color: #BC0A0F;
+    background-color: #faa0a0;
+  }
+
+  #task4 {
+    border-color: green;
+    background-color: #7cf3a0;
+  }
+
+  ::placeholder {
+    /* text-align: center; */
+    /* font-weight: bolder; */
+  }
+
+  .footer {
+    grid-column: 1 / 4;
+    background-color: #2b333d;
+    color: #84868a;
+    font-size: 70%;
+    padding: 5px 5px 50px 30px;
+  }
+
+  .footer a:link, a:visited {
+    color: #dadee8;
+    text-align: center;
+    /* text-decoration: none; */
+    display: inline-block;
+  }
+
+  .footer a:hover, a:active {
+    color: white;
+  }
+
+</style>
+  <div class="exercise-page-grid">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout/Relationship_of_Grid_Layout -->
+    <div class="header">
+      Pre-Intermediate test #42<br>
+      Tenses &amp; conditionals I, II
+    </div>
+    <div class="exercise-container">
+      <div class="exercise-howto">
+        1. Fill the gaps with the right verb (mind the tense)
+      </div>
+      <hr>
+      <div class="task-context">
+        What
+        <input type="text" id="task1" placeholder="be"><input type="submit" name="task1" value="⏎">
+        your name?
+      </div>
+      <div class="task-context">
+        <input type="text" id="task2"><input type="submit" name="task2" value="↵">
+        you ever
+        <input type="text" id="task3" placeholder="see"><input type="submit" name="task3" value="↩">
+        Spider-Man?
+      </div>
+      <div class="task-context">
+        Can you please turn
+        <input type="text" id="task4"><input type="submit" name="task4" value="↵">
+        the TV? It's too loud!
+      </div>
+      <div class="task-context">
+        I
+        <input type="text" id="task5" ,="" placeholder="go"><input type="submit" name="task5" value="↵">
+        swimming as soon as I finish my homework
+      </div>
+      <div class="exercise-howto">
+        2. Change the form of the given word
+      </div>
+      <hr>
+      <div class="task-context">
+        In the centre of the room, clamped to an upright easel, stood the full-length portrait of a young man of
+        <input type="text" id="task6" ,="" placeholder="ordinary"><input type="submit" name="task6" value="↵">
+        personal beauty, and in front of it, some little
+        <input type="text" id="task7" ,="" placeholder="distant"><input type="submit" name="task7" value="↵">
+        away, was sitting the artist himself, Basil Hallward, whose sudden
+        <input type="text" id="task8" ,="" placeholder="appear"><input type="submit" name="task8" value="↵">
+        some years ago caused, at the time, such public
+        <input type="text" id="task9" ,="" placeholder="excite"><input type="submit" name="task9" value="↵">
+        , and gave rise to so many strange conjectures.
+        <br>
+        As the painter looked at the
+        <input type="text" id="task10" ,="" placeholder="grace"><input type="submit" name="task10" value="↵">
+        and comely form he had so
+        <input type="text" id="task11" ,="" placeholder="skill"><input type="submit" name="task11" value="↵">
+        mirrored in his art, a smile of
+        <input type="text" id="task12" ,="" placeholder="please"><input type="submit" name="task12" value="↵">
+        passed across his face, and seemed about to linger there. But he
+        <input type="text" id="task13" ,="" placeholder="sudden"><input type="submit" name="task13" value="↵">
+        started up, and, closing his eyes, placed his fingers upon the lids, as though he sought to
+        <input type="text" id="task14" ,="" placeholder="prison"><input type="submit" name="task14" value="↵">
+        within his brain some curious dream from which he feared he might
+        <input type="text" id="task15" ,="" placeholder="wake"><input type="submit" name="task15" value="↵">
+        .
+      </div>
+    </div>
+    <div class="footer">
+      Found a bug? <a href="#report">Report</a> the page!
+    </div>
+  </div>
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+</script>
+
+
+</body></html>
