@@ -1,7 +1,9 @@
 import json
-from flask import render_template, render_template_string, abort, jsonify, request, redirect, url_for
-from app import app
 
+from flask import render_template, render_template_string, abort, jsonify, request, redirect, url_for
+
+from app import app
+from . import generator_util
 
 def bad_request(error_message):
     abort(400, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
@@ -29,12 +31,9 @@ def exercise_generator():
 @app.route("/exercise_generator/generate", methods=["POST"])
 def generate_exercise():
     if request.method == 'POST':
-        from uuid import uuid4
-        exercise_id = uuid4()
         exercise_data = request.form['gen_input']
-        with open(f"exercisedb/{exercise_id}.txt", 'w', encoding='utf-8') as exc_f:
-            exc_f.write(exercise_data)
-        return redirect(url_for('exercise', exercise_link=exercise_id))
+        exercise_id = generator_util.save_exercise_json(exercise_data)
+        return redirect(url_for('exercise', exercise_id=exercise_id))
 
 
 @app.route("/text_lemmatizer")
@@ -42,27 +41,19 @@ def text_lemmatizer():
     return render_template("lemmatizer.html.j2")
 
 
-@app.route("/exercise/<exercise_link>")
-def exercise(exercise_link):
-    from . import generator_util
-    with open(f"exercisedb/{exercise_link}.txt", 'r', encoding='utf-8') as exercise_input:
-        content = exercise_input.read()
-    content_entities = generator_util.parse_exercise_markup(content)
-
-    return render_template("exercise.html.j2", exercise_link=exercise_link, exercise_content=content_entities)
+@app.route("/exercise/<exercise_id>")
+def exercise(exercise_id):
+    exercise_content = generator_util.load_exercise_json(exercise_id)
+    return render_template("exercise.html.j2", exercise_id=exercise_id, exercise_content=exercise_content)
 
 
-@app.route("/check", methods=["POST"])
-def check():
-    from . import generator_util
-
+@app.route("/exercise/<exercise_id>/check", methods=["POST"])
+def check(exercise_id):
     # https://javascript.info/bubbling-and-capturing
     payload = json.loads(request.data.decode('utf-8'))
     task_id = payload["task_id"]
     student_answer = payload["task_answer"]
-    app.logger.info(payload)
     # TODO remove contraction sensitivity (parse "'m" as "am" and so on)
+    result = generator_util.check_exercise_answer(exercise_id, task_id, student_answer)
 
-    submit_result = generator_util._check_exercise_in_db(task_id, student_answer)
-
-    return jsonify(id=task_id, result=submit_result)
+    return jsonify(id=task_id, result=result)

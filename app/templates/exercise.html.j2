@@ -1,17 +1,32 @@
 {% extends '_student_base.html.j2' %}
 
 {% block content %}
-<p><h3>Sample exercise {{ exercise_link }}</h3></p>
-<hr>
-<form class="exerciseBg" id={{ exercise_link }}>
-  {% for entity in exercise_content %}
-    {% if entity.type == "kb_input" %}
-      <input id="{{ entity.task_id }}" autocomplete="off"><input type="submit" name="check-task" value="↵" task_id="{{ entity.task_id }}">
-    {% elif entity.type == "plaintext" %}
-      {{ entity.content }}
-    {% endif %}
-  {% endfor %}
-</form>
+<div class="exercise-page-grid">
+  <div class="header">
+    TEST TITLE<br>
+    test description
+  </div>
+  <div class="exercise-container">
+    <div class="exercise-howto">
+      1. Not implemented in the generator yet
+    </div>
+    <hr>
+    {% for sentence in exercise_content %}
+      <div class="task-context">
+        {% for token in sentence %}
+          {% if token.type == "kb_input" %}
+            <input type="text" id="{{ token.task_id }}" autocomplete="off" placeholder="{{ token.placeholder }}"><input type="submit" name="check-task" value="↵" task_id="{{ token.task_id }}">
+          {% elif token.type == "plaintext" %}
+            {{ token.content }}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="footer">
+    Found a bug? <a href="#report">Report</a> the page!
+  </div>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -20,11 +35,12 @@
   <script>
     function checkTaskSubmit(event) {
       event.preventDefault();
+      let exerciseId = window.location.pathname.split('/')[2]
       let taskId = event.target.getAttribute("task_id");
       let taskAnswer = document.getElementById(taskId).value;
       let payload = {"task_id": taskId, "task_answer": taskAnswer};
 
-      fetch({{ url_for('check')|tojson }}, {
+      fetch({{ url_for('check', exercise_id=exercise_id)|tojson }}, {
         method: 'POST',
         body: JSON.stringify(payload)
       })

@@ -17,11 +17,112 @@
   box-sizing: border-box;
 }
 
-.exercise-bg {
-  font-family: sans-serif;
-  padding: 20px 5% 20px;
+html {
+  background-color: #e8e3dd;
 }
 
-.exercise-bg input {
-  padding: 3px;
+hr {
+  border: 0;
+  clear: both;
+  display: block;
+  width: 96%;
+  background-color: #bdb8b3;
+  height: 2px;
+}
+
+.exercise-page-grid {
+  display: grid;
+  grid-template-columns: 10% 1fr 10%;
+  grid-gap: 10px;
+  font: 1.2rem Tahoma, Geneva, sans-serif;
+  line-height: 1.6;
+}
+
+.header {
+  grid-column: 1 / 4;
+  color: white;
+  background-color: #2b333d;
+  font-size: 120%;
+  padding: 40px 10px 10px 40px;
+  text-shadow: 1px 1px 1px black;
+}
+
+.exercise-container {
+  grid-column: 2 / 3;
+  display: grid;
+  grid-gap: 20px;
+  background-color: white;
+  border: 1px outset #62b0df;
+  border-radius: 2px;
+  padding: 10px;
+}
+
+.exercise-howto {
+  color: #fd812d;
+  font-size: 130%;
+  line-height: 1;
+  padding: 2% 2% 0 2%;
+  text-shadow: 1px 1px 1px #8acff0;
+}
+
+.task-context {
+  padding: 0 5% 0 5%;
+}
+
+.task-context input[type=text] {
+  border: 2px inset;
+  border-color: #62b0df;
+  border-radius: 3px;
+  font: 1rem Tahoma, Geneva, sans-serif;
+  padding-left: 7px;
+  vertical-align: middle;
+  width: 80px;
+}
+
+.task-context input[type=submit] {
+  background-color: white;
+  border: 2px outset;
+  border-color: #62b0df;
+  border-radius: 3px;
+  color: #62b0df;
+  font-weight: bold;
+  height: 24px;
+  width: 25px;
+  padding: 0px;
+  /* text-shadow: 0.5px 0.5px 0px black; */
+  vertical-align: middle;
+}
+
+#task2 {
+  border-color: #BC0A0F;
+  background-color: #faa0a0;
+}
+
+#task4 {
+  border-color: green;
+  background-color: #7cf3a0;
+}
+
+::placeholder {
+  /* text-align: center; */
+  /* font-weight: bolder; */
+}
+
+.footer {
+  grid-column: 1 / 4;
+  background-color: #2b333d;
+  color: #84868a;
+  font-size: 70%;
+  padding: 5px 5px 50px 30px;
+}
+
+.footer a:link, a:visited {
+  color: #dadee8;
+  text-align: center;
+  /* text-decoration: none; */
+  display: inline-block;
+}
+
+.footer a:hover, a:active {
+  color: white;
 }

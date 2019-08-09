@@ -1,3 +1,4 @@
+import json
 import re
 import uuid
 
@@ -17,23 +18,39 @@ CONTRACTIONS = {
 }
 
 
-def _add_exercise_to_db(input_entity):
-    task_id = input_entity['task_id']
-    correct_answers = input_entity['correct_answers']
-    with open('test_db.txt', 'a', encoding='utf-8') as placeholder_db:
-        placeholder_db.write(f"{task_id}={correct_answers}\n")
+def save_exercise_json(raw_input):
+    exercise_id = uuid.uuid4()
+    tokens = list(_parse_generator_input(raw_input))
+    with open(f"exercisedb/{exercise_id}.json", 'w', encoding='utf-8') as save_f:
+        json.dump(tokens, save_f)
+    return exercise_id
 
 
-def _check_exercise_in_db(task_id, student_answer):
-    with open('test_db.txt', 'r', encoding='utf-8') as placeholder_db:
-        answers = list(placeholder_db)
-        for answer in answers:
-            _task_id, _correct_answer = answer.split('=')
-            if _task_id == task_id:
-                return student_answer in [a.strip()[1:-1] for a in _correct_answer.strip("[]\n").split(",")]
+def load_exercise_json(id):
+    with open(f"exercisedb/{id}.json", 'r', encoding='utf-8') as load_f:
+        exercise_content = json.load(load_f)
+    return exercise_content
 
 
-def parse_exercise_markup(raw_text):
+def check_exercise_answer(exercise_id, task_id, student_answer):
+    exercise = load_exercise_json(exercise_id)
+    for sentence in exercise:
+        for token in sentence:
+            if token.get('task_id') == task_id and student_answer in token.get('correct_answers'):
+                return True
+    return False
+
+
+def _parse_generator_input(raw_input):
+    _raw_sentences = [line for line in raw_input.split('\n') if line.strip() != '']
+    for _raw_sent in _raw_sentences:
+        sent = _raw_sent.replace('\n', '')
+        tokens = [t for t in re.split(r"(<.*?>)", sent) if t != '']
+        tokens = list(_parse_sentence_tokens(tokens))
+        yield tokens
+
+
+def _parse_sentence_tokens(token_list):
     # TODO possibly add auto-(de)capitalization to answers
     """ Markup rules:
     <> - Task wrapper.
@@ -42,32 +59,26 @@ def parse_exercise_markup(raw_text):
         () - input placeholder, e.g. She <is(be)> ready
 
     """
-    raw_tokens = re.split(r"(<.*?>)", raw_text)
-    for token in raw_tokens:
-        if token.startswith("<") and token.endswith(">"):
-            raw_exercise = token[1:-1]
+    for t in token_list:
+        if t.startswith("<") and t.endswith(">"):
+            _raw_task = t[1:-1]
             try:
-                placeholder = re.findall(r"\(.*?\)", raw_exercise)[0][1:-1]
+                placeholder = re.findall(r"\(.*?\)", _raw_task)[0][1:-1]
             except IndexError:
                 placeholder = None
-            answer_options = re.sub(r"\(.*?\)", '', raw_exercise).split("|")
-            classified_token = {"type": "kb_input",
-                                "task_id": str(uuid.uuid4()),
-                                "placeholder": placeholder,
-                                "correct_answers": answer_options}
-            _add_exercise_to_db(classified_token)
+            answer_options = re.sub(r"\(.*?\)", '', _raw_task).split("|")
+            token = {"type": "kb_input",
+                     "task_id": str(uuid.uuid4()),
+                     "placeholder": placeholder,
+                     "correct_answers": answer_options}
 
         else:
-            classified_token = {"type": "plaintext",
-                                "content": token}
+            token = {"type": "plaintext",
+                     "content": t}
+        yield token
 
-        yield classified_token
 
-
-if __name__ == "__main__":
-    import pprint
-    pp = pprint.PrettyPrinter()
-
-    ents = parse_exercise_markup("My name <is(be)> Miguel and I <am> from Penza. I think it <will> be important in the future. How <was|is> your mother doing?")
-
-    pp.pprint([e for e in ents])
+if __name__ == '__main__':
+    check_exercise_answer("e27b4180-4268-4066-82e7-54424e6a1d4d",
+                          "d4daf6f9-5a55-4cf9-bb53-1290b829642c",
+                          student_answer='was')
