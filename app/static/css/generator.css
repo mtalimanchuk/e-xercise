@@ -2,19 +2,23 @@
   box-sizing: border-box;
 }
 
+html {
+  background-color: #e8e3dd;
+}
+
 body {
   margin: 0;
 }
 
 .topnav {
   overflow: hidden;
-  background-color: #333;
+  background-color: #2b333d;
 }
 
 .topnav a {
   float: left;
   display: block;
-  color: #f2f2f2;
+  color: #fd812d;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -26,27 +30,31 @@ body {
   color: black;
 }
 
-.geninfo {
+.topnav a:active {
+  color: red;
+}
+
+.gen-info {
   font-family: sans-serif;
   padding: 10px
 }
 
-.geninfo a:link, a:visited {
-  color: #037421;
+.gen-info a:link, a:visited {
+  color: #fd812d;
   text-align: center;
   text-decoration: none;
   display: inline-block;
 }
 
-.geninfo a:hover, a:active {
+.gen-info a:hover, a:active {
   color: #49a762;
 }
 
-.genform {
+.exercise-input {
   padding: 20px
 }
 
-.genform textarea {
+.exercise-input textarea {
   word-wrap: normal;
   box-shadow: 1px 1px 1px #999;
   border-radius: 5px;
@@ -56,13 +64,4 @@ body {
   padding: 10px;
   line-height: 1.5;
   resize: none;
-}
-
-.genresult {
-  padding: 20px;
-}
-
-.genresult input {
-  padding: 5px;
-  width: 800px;
 }

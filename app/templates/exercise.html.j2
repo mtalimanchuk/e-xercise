@@ -15,7 +15,7 @@
       <div class="task-context">
         {% for token in sentence %}
           {% if token.type == "kb_input" %}
-            <input type="text" id="{{ token.task_id }}" autocomplete="off" placeholder="{{ token.placeholder }}"><input type="submit" name="check-task" value="↵" task_id="{{ token.task_id }}">
+            <input type="text" id="{{ token.task_id }}" autocomplete="off" {% if token.placeholder %} placeholder="{{ token.placeholder }}" {% endif %}><input type="submit" name="check-task" value="↵" task_id="{{ token.task_id }}">
           {% elif token.type == "plaintext" %}
             {{ token.content }}
           {% endif %}
@@ -25,6 +25,9 @@
   </div>
   <div class="footer">
     Found a bug? <a href="#report">Report</a> the page!
+    <br>
+    <br>
+    <a href="{{ url_for('exercise_generator') }}">🠸 Generator</a>
   </div>
 </div>
 {% endblock %}

@@ -31,8 +31,11 @@ def exercise_generator():
 @app.route("/exercise_generator/generate", methods=["POST"])
 def generate_exercise():
     if request.method == 'POST':
-        exercise_data = request.form['gen_input']
-        exercise_id = generator_util.save_exercise_json(exercise_data)
+        exercise_title = request.form['exercise-title']
+        exercise_howto = request.form['exercise-howto']
+        exercise_content = request.form['exercise-content']
+        print(exercise_title, exercise_howto)
+        exercise_id = generator_util.save_exercise_json(exercise_content)
         return redirect(url_for('exercise', exercise_id=exercise_id))
 
 
