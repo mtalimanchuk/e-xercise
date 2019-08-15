@@ -3,24 +3,25 @@
 {% block content %}
 <div class="exercise-page-grid">
   <div class="header">
-    TEST TITLE<br>
-    test description
+    {{ exercise_title }}
   </div>
   <div class="exercise-container">
-    <div class="exercise-howto">
-      1. Not implemented in the generator yet
-    </div>
-    <hr>
-    {% for sentence in exercise_content %}
-      <div class="task-context">
-        {% for token in sentence %}
-          {% if token.type == "kb_input" %}
-            <input type="text" id="{{ token.task_id }}" autocomplete="off" {% if token.placeholder %} placeholder="{{ token.placeholder }}" {% endif %}><input type="submit" name="check-task" value="↵" task_id="{{ token.task_id }}">
-          {% elif token.type == "plaintext" %}
-            {{ token.content }}
-          {% endif %}
-        {% endfor %}
+    {% for activity in exercise_activities %}
+      <div class="exercise-howto">
+        {{ activity.howto }}
       </div>
+      <hr>
+      {% for sentence in activity.content %}
+        <div class="task-context">
+          {% for token in sentence %}
+            {% if token.type == "kb_input" %}
+              <input type="text" id="{{ token.task_id }}" autocomplete="off" {% if token.placeholder %} placeholder="{{ token.placeholder }}" {% endif %}><input type="submit" name="check-task" value="↵" task_id="{{ token.task_id }}">
+            {% elif token.type == "plaintext" %}
+              {{ token.text }}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
     {% endfor %}
   </div>
   <div class="footer">

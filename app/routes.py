@@ -31,11 +31,16 @@ def exercise_generator():
 @app.route("/exercise_generator/generate", methods=["POST"])
 def generate_exercise():
     if request.method == 'POST':
-        exercise_title = request.form['exercise-title']
-        exercise_howto = request.form['exercise-howto']
-        exercise_content = request.form['exercise-content']
-        print(exercise_title, exercise_howto)
-        exercise_id = generator_util.save_exercise_json(exercise_content)
+        title = request.form['exercise-title']
+        activities = []
+
+        # TODO add multiple entry forms
+        howto = request.form['exercise-howto']
+        raw_content = request.form['exercise-content']
+        activity = {'howto': howto, 'raw_content': raw_content}
+        activities.append(activity)
+
+        exercise_id = generator_util.save_exercise(title, activities)
         return redirect(url_for('exercise', exercise_id=exercise_id))
 
 
@@ -46,8 +51,11 @@ def text_lemmatizer():
 
 @app.route("/exercise/<exercise_id>")
 def exercise(exercise_id):
-    exercise_content = generator_util.load_exercise_json(exercise_id)
-    return render_template("exercise.html.j2", exercise_id=exercise_id, exercise_content=exercise_content)
+    exercise_title, exercise_activities = generator_util.load_exercise(exercise_id)
+    return render_template("exercise.html.j2",
+                           exercise_id=exercise_id,
+                           exercise_title=exercise_title,
+                           exercise_activities=exercise_activities)
 
 
 @app.route("/exercise/<exercise_id>/check", methods=["POST"])
