@@ -1,11 +1,3 @@
-Click
 Flask
-Jinja2
-MarkupSafe
-Werkzeug
-itsdangerous
-setuptools
-pymysql
 Flask-SQLAlchemy
 Flask-Migrate
-Flask-pymysql

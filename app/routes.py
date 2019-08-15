@@ -1,6 +1,6 @@
 import json
 
-from flask import render_template, render_template_string, abort, jsonify, request, redirect, url_for
+from flask import render_template, abort, jsonify, request, redirect, url_for
 
 from app import app
 from . import generator_util

@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
+    # DB
     DB_HOST = 'localhost'
     DB_USERNAME = 'classroom'
     DB_PASSWORD = 'classroom'
@@ -13,3 +14,5 @@ class Config(object):
              'mysql://' + DB_USERNAME + ":" + DB_PASSWORD + "@" + DB_HOST + ':3306/' + DB_NAME
     SQLALCHEMY_DATABASE_URI = DB_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # ETC
+    DEBUG = True
