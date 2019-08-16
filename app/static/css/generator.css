@@ -64,6 +64,21 @@ form {
   grid-gap: 20px;
 }
 
+form input[type=submit] {
+  border: none;
+  width: 40%;
+  padding: 10px;
+  background-color: RGBA(232, 82, 53, .8);
+  color: white;
+}
+
+form input[type=submit]:hover {
+  background-color: RGBA(232, 82, 53, 1);
+  border-radius: 0px;
+  outline: 1px outset RGBA(232, 82, 53, 1);
+  outline-offset: 0px;
+}
+
 .exercise-title {
   grid-row: auto;
 }
@@ -72,34 +87,59 @@ form {
   border: none;
   border-radius: 3px;
   color: white;
-  background-color: #2b333d;
+  background-color: RGBA(43, 51, 61, .8);
   font: 1rem Tahoma, Geneva, sans-serif;
-  padding: 10px;
+  padding: 20px 10px 10px 10px;
   width: 100%;
+  letter-spacing: 0.1em;
+}
+
+.exercise-title input[type=text]:hover,
+.exercise-title input[type=text]:focus {
+  background-color: RGBA(43, 51, 61, 1);
+  border-radius: 0px;
+  outline: 1px outset #2b333d;
+  outline-offset: 0px;
+}
+
+.exercise-title input[type=text]::placeholder {
+  text-decoration: underline;
 }
 
 .exercise-input {
   padding: 3%;
   display: grid;
-  grid-gap: 5px;
+  grid-gap: 20px;
+  background-color: RGBA(255, 255, 255, .3);
+  border-radius: 3px;
 }
 
-.exercise-input input[type=text]{
+.exercise-input input[type=text] {
   border: none;
-  border-radius: 3px;
+  border-radius: inherit;
+  background-color: RGBA(255, 255, 255, .8);
   color: #fd812d;
   font: 1rem Tahoma, Geneva, sans-serif;
-  padding: 7px;
+  padding: 10px 7px 10px 7px;
+  letter-spacing: 0.06em;
 }
 
 .exercise-input textarea {
   word-wrap: normal;
-  box-shadow: 1px 1px 1px #999;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  box-sizing: content-box;
-  background-color: white;
-  padding: 10px;
+  border: none;
+  border-radius: inherit;
+  background-color: RGBA(255, 255, 255, .8);
+  padding: 7px;
   line-height: 1.5;
   resize: none;
+}
+
+.exercise-input input[type=text]:hover,
+.exercise-input input[type=text]:focus,
+.exercise-input textarea:hover,
+.exercise-input textarea:focus {
+  background-color: RGBA(255, 255, 255, 1);
+  border-radius: 0px;
+  outline: 1px inset white;
+  outline-offset: 0px;
 }
