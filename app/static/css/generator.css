@@ -34,7 +34,15 @@ body {
   color: red;
 }
 
+.gen-page-grid {
+  display: grid;
+  grid-template-columns: 10% 1fr 10%;
+  grid-gap: 10px;
+
+}
+
 .gen-info {
+  grid-column: 1 / 4;
   font-family: sans-serif;
   padding: 10px
 }
@@ -50,26 +58,38 @@ body {
   color: #49a762;
 }
 
+form {
+  grid-column: 2 / 3;
+  display: grid;
+  grid-gap: 20px;
+}
+
 .exercise-title {
-  padding-left: 10%;
+  grid-row: auto;
 }
 
 .exercise-title input[type=text] {
-  border: 2px inset;
+  border: none;
   border-radius: 3px;
+  color: white;
+  background-color: #2b333d;
   font: 1rem Tahoma, Geneva, sans-serif;
-  padding-left: 7px;
+  padding: 10px;
+  width: 100%;
 }
 
 .exercise-input {
-  padding-left: 10%;
+  padding: 3%;
+  display: grid;
+  grid-gap: 5px;
 }
 
 .exercise-input input[type=text]{
-  border: 2px inset;
+  border: none;
   border-radius: 3px;
-  font: 0.7rem Tahoma, Geneva, sans-serif;
-  padding-left: 7px;
+  color: #fd812d;
+  font: 1rem Tahoma, Geneva, sans-serif;
+  padding: 7px;
 }
 
 .exercise-input textarea {

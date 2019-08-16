@@ -15,4 +15,4 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = DB_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # ETC
-    DEBUG = True
+    # DEBUG = True
