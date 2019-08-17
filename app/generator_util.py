@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 import re
-import uuid
 
 import shortuuid
 
