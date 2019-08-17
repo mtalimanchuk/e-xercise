@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
+    SECRET_KEY = "suchsafemuchsecret"
     # DB
     DB_HOST = 'localhost'
     DB_USERNAME = 'classroom'

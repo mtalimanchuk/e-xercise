@@ -2,6 +2,17 @@
 {% extends '_teacher_base.html.j2' %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 <div class="gen-page-grid">
   <div class="gen-info">
     <h3>Markup rules</h3>

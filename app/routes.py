@@ -1,9 +1,11 @@
 import json
 
-from flask import render_template, abort, jsonify, request, redirect, url_for
+from flask import (abort, flash, jsonify, redirect, render_template, request,
+                   url_for)
 
 from app import app
 from . import generator_util
+
 
 def bad_request(error_message):
     abort(400, {"message": error_message})  # FIXME: missing proper Content-Type header, it should be application/json
@@ -40,13 +42,12 @@ def generate_exercise():
         activity = {'howto': howto, 'raw_content': raw_content}
         activities.append(activity)
 
-        exercise_id = generator_util.save_exercise(title, activities)
-        return redirect(url_for('exercise', exercise_id=exercise_id))
-
-
-@app.route("/text_lemmatizer")
-def text_lemmatizer():
-    return render_template("lemmatizer.html.j2")
+        if title and len(activities) > 0:
+            exercise_id = generator_util.save_exercise(title, activities)
+            return redirect(url_for('exercise', exercise_id=exercise_id))
+        else:
+            flash("Make sure to fill the title and at least 1 activity")
+            return redirect(url_for('exercise_generator'))
 
 
 @app.route("/exercise/<exercise_id>")
