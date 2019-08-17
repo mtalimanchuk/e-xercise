@@ -5,17 +5,33 @@ import re
 import shortuuid
 
 _db = Path('db')
+# https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+# https://pythonhosted.org/Flask-FormEncode/
+input_sanitizing_rules = [('&', '&amp;'),
+                          ('<', '&lt;'),
+                          ('>', '&gt;'),
+                          ('"', '&quot;'),
+                          ("'", '&#39;'),
+                          ("/", '&#x2F')
+                          ]
+
+
+def _sanitize_input(form_input):
+    for rule in input_sanitizing_rules:
+        form_input = form_input.replace(*rule)
+    return form_input
 
 
 class Exercise:
     def __init__(self, title, raw_activities):
-        self.title = title
+        self.title = _sanitize_input(title)
         self.id = shortuuid.ShortUUID().random(length=10)
         self.answer_keys = {}
         self.activities = []
         for activity in raw_activities:
-            howto = activity['howto']
-            tokens = list(self._parse_generator_input(activity['raw_content']))
+            howto = _sanitize_input(activity['howto'])
+            raw_content = activity['raw_content']   # sanitize also?
+            tokens = list(self._parse_generator_input(raw_content))
             self.activities.append({'howto': howto, 'content': tokens})
         self._exercise_path = _db / 'exercise' / f"{self.id}.json"
         self._answerkey_path = _db / 'answerkey' / f"{self.id}.json"
