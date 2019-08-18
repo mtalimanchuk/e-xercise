@@ -52,11 +52,15 @@ def generate_exercise():
 
 @app.route("/exercise/<exercise_id>")
 def exercise(exercise_id):
-    exercise_title, exercise_activities = generator_util.load_exercise(exercise_id)
-    return render_template("exercise.html.j2",
-                           exercise_id=exercise_id,
-                           exercise_title=exercise_title,
-                           exercise_activities=exercise_activities)
+    try:
+        exercise_title, exercise_activities = generator_util.load_exercise(exercise_id)
+        return render_template("exercise.html.j2",
+                               exercise_id=exercise_id,
+                               exercise_title=exercise_title,
+                               exercise_activities=exercise_activities)
+    except FileNotFoundError as e:
+        print(f"{type(e)}: {e}")
+        return abort(404, f"Exercise {exercise_id} doesn't exist :(")
 
 
 @app.route("/exercise/<exercise_id>/check", methods=["POST"])
