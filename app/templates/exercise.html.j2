@@ -57,9 +57,11 @@
     function showTaskSubmitResult(data) {
       let input = document.getElementById(data.id);
       if (data.result === true){
-        input.style.backgroundColor = '#14ff8f';
+        input.style.backgroundColor = '#dff2bf';
+        input.style.borderColor = '#4f8a10';
       } else {
-        input.style.backgroundColor = '#ff939c';
+        input.style.backgroundColor = '#ffd2d2';
+        input.style.borderColor = '#d8000c';
       }
     }
 

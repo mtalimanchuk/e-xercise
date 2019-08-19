@@ -35,7 +35,7 @@ hr {
   grid-template-columns: 10% 1fr 10%;
   grid-gap: 10px;
   font: 1.2rem Tahoma, Geneva, sans-serif;
-  line-height: 1.6;
+  line-height: 2;
 }
 
 .header {
@@ -93,14 +93,11 @@ hr {
   vertical-align: middle;
 }
 
-#task2 {
-  border-color: #BC0A0F;
-  background-color: #faa0a0;
-}
-
-#task4 {
-  border-color: green;
-  background-color: #7cf3a0;
+.task-context input:hover,
+.task-context input[type=text]:focus {
+  border-radius: 0px;
+  outline: 1px inset white;
+  outline-offset: 0px;
 }
 
 ::placeholder {
