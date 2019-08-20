@@ -1,0 +1,37 @@
+<!--@formatter:off-->
+{% extends '_teacher_base.html.j2' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<div class="gen-page-grid">
+  <div class="gen-info">
+    <h3>Markup rules</h3>
+    &lt; &gt; - Task wrapper. Contents may include<br>
+    <ul>
+      <li>| - delimiter for possible answers, e.g. He &lt;will|is going to&gt; play basketball tomorrow</li>
+      <li>() - input placeholder, e.g. She &lt;is(be)&gt; ready</li>
+    </ul>
+  </div>
+  <!-- https://stackoverflow.com/questions/6964927/how-to-create-a-form-dynamically-via-javascript#6964949 -->
+  <form action = "{{ url_for('generate_exercise') }}" method="post" autocomplete="off">
+    <div class="exercise-title">
+      <input type="text" name="exercise-title" placeholder="Set exercise title">
+    </div>
+    <div class="exercise-input">
+      <input type="text" name="exercise-howto" placeholder="Exercise instructions">
+      <textarea name="exercise-content" placeholder="One sentence per line" cols="50" rows="10"></textarea>
+    </div>
+    <input type="submit">
+  </form>
+</div>
+{% endblock %}

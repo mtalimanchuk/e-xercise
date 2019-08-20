@@ -1,0 +1,145 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #e8e3dd;
+}
+
+body {
+  margin: 0;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #2b333d;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #fd812d;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-family: sans-serif;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a:active {
+  color: red;
+}
+
+.gen-page-grid {
+  display: grid;
+  grid-template-columns: 10% 1fr 10%;
+  grid-gap: 10px;
+
+}
+
+.gen-info {
+  grid-column: 1 / 4;
+  font-family: sans-serif;
+  padding: 10px
+}
+
+.gen-info a:link, a:visited {
+  color: #fd812d;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.gen-info a:hover, a:active {
+  color: #49a762;
+}
+
+form {
+  grid-column: 2 / 3;
+  display: grid;
+  grid-gap: 20px;
+}
+
+form input[type=submit] {
+  border: none;
+  width: 40%;
+  padding: 10px;
+  background-color: RGBA(232, 82, 53, .8);
+  color: white;
+}
+
+form input[type=submit]:hover {
+  background-color: RGBA(232, 82, 53, 1);
+  border-radius: 0px;
+  outline: 1px outset RGBA(232, 82, 53, 1);
+  outline-offset: 0px;
+}
+
+.exercise-title {
+  grid-row: auto;
+}
+
+.exercise-title input[type=text] {
+  border: none;
+  border-radius: 3px;
+  color: white;
+  background-color: RGBA(43, 51, 61, .8);
+  font: 1rem Tahoma, Geneva, sans-serif;
+  padding: 20px 10px 10px 10px;
+  width: 100%;
+  letter-spacing: 0.1em;
+}
+
+.exercise-title input[type=text]:hover,
+.exercise-title input[type=text]:focus {
+  background-color: RGBA(43, 51, 61, 1);
+  border-radius: 0px;
+  outline: 1px outset #2b333d;
+  outline-offset: 0px;
+}
+
+.exercise-title input[type=text]::placeholder {
+  text-decoration: underline;
+}
+
+.exercise-input {
+  padding: 3%;
+  display: grid;
+  grid-gap: 20px;
+  background-color: RGBA(255, 255, 255, .3);
+  border-radius: 3px;
+}
+
+.exercise-input input[type=text] {
+  border: none;
+  border-radius: inherit;
+  background-color: RGBA(255, 255, 255, .8);
+  color: #fd812d;
+  font: 1rem Tahoma, Geneva, sans-serif;
+  padding: 10px 7px 10px 7px;
+  letter-spacing: 0.06em;
+}
+
+.exercise-input textarea {
+  word-wrap: normal;
+  border: none;
+  border-radius: inherit;
+  background-color: RGBA(255, 255, 255, .8);
+  padding: 7px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.exercise-input input[type=text]:hover,
+.exercise-input input[type=text]:focus,
+.exercise-input textarea:hover,
+.exercise-input textarea:focus {
+  background-color: RGBA(255, 255, 255, 1);
+  border-radius: 0px;
+  outline: 1px inset white;
+  outline-offset: 0px;
+}

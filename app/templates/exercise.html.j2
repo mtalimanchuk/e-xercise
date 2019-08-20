@@ -1,0 +1,74 @@
+{% extends '_student_base.html.j2' %}
+
+{% block content %}
+<div class="exercise-page-grid">
+  <div class="header">
+    {{ exercise_title }}
+  </div>
+  <div class="exercise-container">
+    {% for activity in exercise_activities %}
+      <div class="exercise-howto">
+        {{ activity.howto }}
+      </div>
+      <hr>
+      {% for sentence in activity.content %}
+        <div class="task-context">
+          {% for token in sentence %}
+            {% if token.type == "kb_input" %}
+              <input type="text" id="{{ token.task_id }}" autocomplete="off" {% if token.placeholder %} placeholder="{{ token.placeholder }}" {% endif %}><input type="submit" name="check-task" value="↵" task_id="{{ token.task_id }}">
+            {% elif token.type == "plaintext" %}
+              {{ token.text }}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+  <div class="footer">
+    Found a bug? <a href="#report">Report</a> the page!
+    <br>
+    <br>
+    <a href="{{ url_for('exercise_generator') }}">🠸 Generator</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+  <script src="https://unpkg.com/promise-polyfill@7.1.2/dist/polyfill.min.js"></script>
+  <script src="https://unpkg.com/whatwg-fetch@2.0.4/fetch.js"></script>
+  <script>
+    function checkTaskSubmit(event) {
+      event.preventDefault();
+      let exerciseId = window.location.pathname.split('/')[2]
+      let taskId = event.target.getAttribute("task_id");
+      let taskAnswer = document.getElementById(taskId).value;
+      let payload = {"task_id": taskId, "task_answer": taskAnswer};
+
+      fetch({{ url_for('check', exercise_id=exercise_id)|tojson }}, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+        .then(parseJSON)
+        .then(showTaskSubmitResult);
+    }
+    function parseJSON(response) {
+      return response.json();
+    }
+    function showTaskSubmitResult(data) {
+      let input = document.getElementById(data.id);
+      if (data.result === true){
+        input.style.backgroundColor = '#dff2bf';
+        input.style.borderColor = '#4f8a10';
+      } else {
+        input.style.backgroundColor = '#ffd2d2';
+        input.style.borderColor = '#d8000c';
+      }
+    }
+
+    let submitButtonsArray = document.getElementsByName("check-task");
+    submitButtonsArray.forEach(function(element) {
+        element.addEventListener('click', checkTaskSubmit)
+    })
+
+  </script>
+{% endblock %}

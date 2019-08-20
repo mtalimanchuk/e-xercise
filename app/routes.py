@@ -1,6 +1,10 @@
 import json
-from flask import render_template, abort, jsonify, request
+
+from flask import (abort, flash, jsonify, redirect, render_template, request,
+                   url_for)
+
 from app import app
+from . import generator_util
 
 
 def bad_request(error_message):
@@ -15,31 +19,57 @@ def ok(message):
     return jsonify({'message': message}), 200
 
 
-#### PUBLIC RESOURCES:
 @app.route("/")
 @app.route("/index")
 def index():
-    return '<a href="/exercise/TestLink">Test</a>'
+    return render_template("index.html.j2")
 
 
-@app.route("/exercise/<exercise_link>")
-def exercise(exercise_link):
-    return render_template("exercise.html", exercise_link=exercise_link)
+@app.route("/exercise_generator")
+def exercise_generator():
+    return render_template("generator.html.j2")
 
 
-@app.route("/check", methods=["POST"])
-def check():
+@app.route("/exercise_generator/generate", methods=["POST"])
+def generate_exercise():
+    if request.method == 'POST':
+        title = request.form['exercise-title']
+        activities = []
 
-    ANSWERS = {'task1': 'am', 'task2': 'were'}
-    check_answer_in_db = lambda _id, _answer: ANSWERS[_id] == _answer
+        # TODO add multiple entry forms
+        howto = request.form['exercise-howto']
+        raw_content = request.form['exercise-content']
+        activity = {'howto': howto, 'raw_content': raw_content}
+        activities.append(activity)
 
+        if title and len(activities) > 0:
+            exercise_id = generator_util.save_exercise(title, activities)
+            return redirect(url_for('exercise', exercise_id=exercise_id))
+        else:
+            flash("Make sure to fill the title and at least 1 activity")
+            return redirect(url_for('exercise_generator'))
+
+
+@app.route("/exercise/<exercise_id>")
+def exercise(exercise_id):
+    try:
+        exercise_title, exercise_activities = generator_util.load_exercise(exercise_id)
+        return render_template("exercise.html.j2",
+                               exercise_id=exercise_id,
+                               exercise_title=exercise_title,
+                               exercise_activities=exercise_activities)
+    except FileNotFoundError as e:
+        print(f"{type(e)}: {e}")
+        return abort(404, f"Exercise {exercise_id} doesn't exist :(")
+
+
+@app.route("/exercise/<exercise_id>/check", methods=["POST"])
+def check(exercise_id):
     # https://javascript.info/bubbling-and-capturing
     payload = json.loads(request.data.decode('utf-8'))
     task_id = payload["task_id"]
-    task_answer = payload["task_answer"]
-    app.logger.info(payload)
+    student_answer = payload["task_answer"]
     # TODO remove contraction sensitivity (parse "'m" as "am" and so on)
+    result = generator_util.check_exercise_answer(exercise_id, task_id, student_answer)
 
-    submit_result = check_answer_in_db(task_id, task_answer)
-
-    return jsonify(id=task_id, result=submit_result)
+    return jsonify(id=task_id, result=result)
