@@ -14,8 +14,11 @@ timeout = 120
 #       A string of "debug", "info", "warning", "error", "critical"
 #
 
-_logpath = 'gunicorn_logs/'
-errorlog = _logpath + 'errors.log'
-loglevel = 'info'
-accesslog = _logpath + 'access.log'
-access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+_logpath = "gunicorn_logs/"
+errorlog = _logpath + "errors.log"
+loglevel = "info"
+accesslog = _logpath + "access.log"
+# https://stackoverflow.com/a/25737799/4443571
+access_log_format = """
+    %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" "%({X-Real-IP}i)s" "%({Header}i)"
+"""
