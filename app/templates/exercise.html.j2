@@ -34,21 +34,23 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='javascript/exercise.js') }}"></script>
 <script>
-    url = {{ url_for('check', exercise_id=exercise_id)|tojson }}
-    let submitButtonsArray = document.getElementsByName("check-task");
-    submitButtonsArray.forEach(function(element) {
-      element.addEventListener('click', (event) => checkTaskSubmit(url, event));
-    })
+  url = {{ url_for('check', exercise_id=exercise_id)|tojson }}
+  let submitButtonsArray = document.getElementsByName("check-task");
+  submitButtonsArray.forEach(function(element) {
+    element.addEventListener('click', (event) => checkTaskSubmit(url, event));
+  })
 
-    let inputFieldsArray = document.getElementsByName("task-input");
-    inputFieldsArray.forEach(function(element) {
-      element.addEventListener('keypress', function(event) {
-        var key = event.which || event.keyCode;
-        if (key === 13) { // 13 is enter
-          checkTaskSubmit(url, event);
-        }
-      })
+  let inputFieldsArray = document.getElementsByName("task-input");
+  inputFieldsArray.forEach(function(element) {
+    element.addEventListener('keyup', function(event) {
+      var key = event.keyCode;
+      if (key === 13) { // 13 is enter
+        checkTaskSubmit(url, event);
+      }
+      else {
+        resizeInput(event);
+      }
     })
-
+  })
 </script>
 {% endblock %}

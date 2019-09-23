@@ -75,8 +75,9 @@ hr {
   border-radius: 3px;
   font: 1rem Tahoma, Geneva, sans-serif;
   padding-left: 7px;
+  padding-right: 7px;
   vertical-align: middle;
-  width: 80px;
+  width: 10ch;
 }
 
 .task-context input[type=submit] {

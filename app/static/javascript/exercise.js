@@ -24,3 +24,15 @@ function showTaskSubmitResult(data) {
     input.style.backgroundColor = '#ff939c';
   }
 }
+
+function resizeInput(event) {
+  let element = event.target;
+  let inputLength = element.value.length;
+  console.log(element.offsetWidth + "/" + inputLength)
+  if (inputLength >= 10) {
+    element.style.width = inputLength + "ch";
+  }
+  else {
+    element.style.width = "10ch";
+  }
+}
