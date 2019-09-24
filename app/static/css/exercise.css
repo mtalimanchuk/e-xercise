@@ -101,10 +101,10 @@ hr {
   outline-offset: 0px;
 }
 
-::placeholder {
-  /* text-align: center; */
-  /* font-weight: bolder; */
-}
+/* ::placeholder {
+  text-align: center;
+  font-weight: bolder;
+} */
 
 .footer {
   grid-column: 1 / 4;
